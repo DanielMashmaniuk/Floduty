@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="main_bg">#0c0f0d</color>
+    <color name="second_bg">#0E1210</color>
+    <color name="primary_color">#003e0b</color>
+    <color name="orange_color">#eb6424</color>
+    <color name="attention_color">#890000</color>
+    <color name="text_color">#ffdac6</color>
+    <color name="white">#DEDEDE</color>
+</resources>
