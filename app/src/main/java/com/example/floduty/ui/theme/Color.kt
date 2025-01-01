@@ -6,7 +6,7 @@ class Palette(
     val mainBG: Color = Color(0xFF0C0F0D),
 
     val secondBG: Color = Color(0xFF0E1210),
-    val dark: Color = Color(0xFF1A1F1F),
+    val dark: Color = Color(0xFF121515),
 
     val lightGaryBG: Color = Color(0xFF272727),
     val primaryColor: Color = Color(0xFF015710),
