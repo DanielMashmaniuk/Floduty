@@ -1,21 +1,21 @@
 package com.example.floduty.data
 
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import com.example.floduty.data.models.Task
+import com.example.floduty.data.db.TaskDao
 import com.example.floduty.ui.theme.Palette
 import java.time.LocalDate
-import java.time.Month
-import java.time.MonthDay
-import java.time.Year
+import java.time.LocalTime
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
     val palette = Palette()
     var currentMonth = mutableIntStateOf(getCurrentMonth())
     var currentYear = mutableIntStateOf(getCurrentYear())
     var currentDay = mutableIntStateOf(getCurrentDay())
+    val cuurrentHour = mutableIntStateOf(getCurrentHour())
+    val cuurrentMinute = mutableIntStateOf(getCurrentMinute())
     private val nameMonthByNumber = mapOf(
         1 to "January",
         2 to "February",
@@ -43,6 +43,20 @@ class MainViewModel : ViewModel() {
         3 to palette.mediumColor,
         4 to palette.hardColor,
         5 to palette.extremeColor
+    )
+    val tasks = listOf(
+        Task(
+            name = "Work",
+            description = "LOL",
+            startHour = 22,
+            startMinute = 0,
+            endHour = 23,
+            endMinute = 0,
+            notes = "JJ",
+            weight = 4,
+            date = "2024/12/28",
+            isCompleted = false,
+        )
     )
     fun getLevelName(level: Int): String =
         nameLevelByNumber[level] ?: "Unknown"
@@ -107,4 +121,12 @@ fun getCurrentYear(): Int {
 fun getCurrentDay(): Int{
     val currentDate = LocalDate.now()
     return currentDate.dayOfMonth
+}
+fun getCurrentMinute(): Int {
+    val currentTime = LocalTime.now() // Отримуємо поточний час
+    return currentTime.minute // Повертаємо хвилину
+}
+fun getCurrentHour(): Int {
+    val currentTime = LocalTime.now() // Отримуємо поточний час
+    return currentTime.hour // Повертаємо хвилину
 }

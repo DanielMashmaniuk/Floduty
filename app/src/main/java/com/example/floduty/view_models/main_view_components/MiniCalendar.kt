@@ -161,7 +161,7 @@ fun CustomCalendar(year: Int,month: Int,currentDay: Int, palette: Palette, mainV
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 week.forEach { day ->
-                    if (mainViewModel.isCurrentDay(year,month, day?.dayOfMonth ?: 0)) {
+                    if (mainViewModel.isCurrentDay(year,day!!.monthValue, day.dayOfMonth)) {
                         CurrentDayBox(day?.dayOfMonth, palette) // Для поточного місяця
                     } else if (day != null) {
                         if (day.monthValue != month) {

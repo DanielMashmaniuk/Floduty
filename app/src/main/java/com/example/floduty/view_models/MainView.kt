@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.floduty.R
 import com.example.floduty.data.MainViewModel
+import com.example.floduty.data.db.TaskDao
 import com.example.floduty.ui.theme.Palette
 import com.example.floduty.view_models.main_view_components.MainContent
 import com.example.floduty.view_models.main_view_components.MiniCalendar
@@ -46,8 +47,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 @Composable
-fun MainView() {
-    val mainViewModel: MainViewModel = viewModel()
+fun MainView(mainViewModel: MainViewModel) {
     val palette = Palette()
     val currentMonth = mainViewModel.currentMonth.intValue
     val currentYear = mainViewModel.currentYear.intValue

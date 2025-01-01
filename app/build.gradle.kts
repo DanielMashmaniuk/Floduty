@@ -1,11 +1,13 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+    id ("kotlin-kapt")  // Додаємо KAPT
 }
 
 android {
     namespace = "com.example.floduty"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.floduty"
@@ -18,6 +20,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+
     }
 
     buildTypes {
@@ -40,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.4"  // Updated to match compose compiler plugin version
     }
     packaging {
         resources {
@@ -48,9 +52,17 @@ android {
         }
     }
 }
+kapt {
+    correctErrorTypes = true
+}
+// Define compose compiler configuration
+
 
 dependencies {
-
+    implementation(libs.ui.v140)
+    implementation(libs.androidx.material)
+    implementation(libs.ui.tooling.preview)
+    debugImplementation(libs.ui.tooling)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -69,8 +81,14 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    implementation (libs.androidx.foundation)
-    implementation (libs.ui)
+    implementation(libs.androidx.foundation)
+    implementation(libs.ui)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
+    implementation(libs.androidx.room.runtime.v250)
+    implementation(libs.kotlin.stdlib)
+    kapt (libs.androidx.room.compiler) // для Kotlin
+
+    implementation(libs.dagger)
+    implementation(libs.androidx.compiler)
 }
