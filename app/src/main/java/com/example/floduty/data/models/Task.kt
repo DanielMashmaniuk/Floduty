@@ -13,7 +13,8 @@ data class Task(
     val startMinute: Int,
     val endHour: Int,
     val endMinute: Int,
-    val date: String,
+    val startDate: String,
+    val endDate: String,
     val weight: Int,
     val isCompleted: Boolean
 ) {

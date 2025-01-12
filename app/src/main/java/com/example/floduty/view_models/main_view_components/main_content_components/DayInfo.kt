@@ -125,23 +125,27 @@ fun InfoBox(description: String,level : Int,palette: Palette,mainViewModel: Main
                 fontWeight = FontWeight.Bold
             )
         )
-        Box(
-            modifier = Modifier
-                .height(30.dp)
-                .width(100.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .background(mainViewModel.getLevelColor(level)),
-            contentAlignment = Alignment.Center
-        ){
-            Text(
-                text = mainViewModel.getLevelName(level),
-                color = palette.mainBG,
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
+        LevelBox(level,palette,mainViewModel)
+    }
+}
+@Composable
+fun LevelBox(level: Int,palette: Palette,mainViewModel: MainViewModel){
+    Box(
+        modifier = Modifier
+            .height(30.dp)
+            .width(100.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(mainViewModel.getLevelColor(level)),
+        contentAlignment = Alignment.Center
+    ){
+        Text(
+            text = mainViewModel.getLevelName(level),
+            color = palette.mainBG,
+            style = TextStyle(
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
             )
-        }
+        )
     }
 }
 @Composable

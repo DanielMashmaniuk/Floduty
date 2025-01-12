@@ -48,7 +48,7 @@ fun ScheduleTable(
         ) {
             Spacer(modifier = Modifier.height(15.dp)) // Для годин зліва
             hours.forEach { hour ->
-                if (hour.toInt() == mainViewModel.cuurrentHour.intValue) {
+                if (hour.toInt() == mainViewModel.currentHour.intValue) {
                     Text(
                         text = hour,
                         color = palette.orangeColor,
@@ -159,7 +159,7 @@ fun checkTaskAtTime(time: Int,tasks: List<Task>) : Pair<Boolean,Task?>{
     return Pair(false,null)
 }
 fun checkActiveTime(mainViewModel: MainViewModel): Int{
-    var min = mainViewModel.cuurrentMinute.intValue
+    var min = mainViewModel.currentMinute.intValue
     println(min)
     while (min % 5 != 0){
         min += 1

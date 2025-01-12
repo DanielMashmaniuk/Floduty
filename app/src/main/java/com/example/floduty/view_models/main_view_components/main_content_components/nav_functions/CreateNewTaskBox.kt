@@ -1,32 +1,33 @@
 package com.example.floduty.view_models.main_view_components.main_content_components.nav_functions
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.DropdownMenu
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,190 +35,491 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.floduty.R
+import com.example.floduty.data.MainViewModel
+import com.example.floduty.data.models.DateAndTime
 import com.example.floduty.ui.theme.Palette
+import com.example.floduty.view_models.main_view_components.main_content_components.LevelBox
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalTime
 
 @Composable
-fun CreateNewTaskBox(palette: Palette) {
+fun CreateNewTaskBox(palette: Palette,mainViewModel: MainViewModel,isCreateActivityWindowVisible: MutableState<Boolean>) {
     val nameActivity = remember { mutableStateOf("Task") }
-    Box(
-        modifier = Modifier
-            .height(600.dp)
-            .width(350.dp)
-            .shadow(8.dp, shape = RoundedCornerShape(20.dp)) // Тінь із закругленими краями
-            .clip(RoundedCornerShape(20.dp))
-            .background(palette.dark)
-    ){
-        //main column container
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+    AnimatedVisibility(
+        visible = isCreateActivityWindowVisible.value,
+        enter = fadeIn() + expandVertically(),  // Ефект появи
+        exit = fadeOut() + shrinkVertically()   // Ефект зникнення
+    ) {
+        Box(
+            modifier = Modifier
+                .height(600.dp)
+                .width(350.dp)
+                .shadow(8.dp, shape = RoundedCornerShape(20.dp)) // Тінь із закругленими краями
+                .clip(RoundedCornerShape(20.dp))
+                .background(palette.dark)
         ) {
+            // cancel button
             Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                contentAlignment = Alignment.Center
-            ){
-                // label column
-                Column (
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                Modifier.fillMaxWidth().height(45.dp).padding(top = 15.dp, end = 15.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                IconButton(
+                    onClick = {
+                        isCreateActivityWindowVisible.value =
+                            !isCreateActivityWindowVisible.value
+                    },
+                    modifier = Modifier.size(28.dp)
                 ) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ){
-                        // main title
-                        Text(
-                            text = "Create a new ${nameActivity.value}",
-                            color = getActivityColorByName(nameActivity.value, palette),
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }
-                    // button task
-                    Box(
-                        Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
+                    Icon(
+                        painter = painterResource(id = R.drawable.more_unfold),
+                        contentDescription = "back",
+                        tint = getActivityColorByName(nameActivity.value, palette),
+                        modifier = Modifier
+                            .size(28.dp)
+                    )
+                }
+            }
+            // choose time screen
+            Box(Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .height(100.dp)
+
+            ){
+
+            }
+            //main column container
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(80.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    // label column
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(0.dp)
                     ) {
-                        var isClicked = remember { mutableStateOf(false) }
-                        val animatedWidth = animateDpAsState(targetValue = if (isClicked.value) 90.dp else 80.dp,
-                            label = ""
-                        )
-                        val animatedHeight = animateDpAsState(targetValue = if (isClicked.value) 35.dp else 30.dp,
-                            label = ""
-                        )
-                        val coroutineScope = rememberCoroutineScope()
                         Box(
-                            modifier = Modifier
-                                .height(animatedHeight.value)
-                                .width(animatedWidth.value)
-                                .clip(RoundedCornerShape(50.dp))
-                                .background(getActivityColorByName(nameActivity.value, palette))
-                                .padding(5.dp)
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                )
-                                {
-                                    isClicked.value = true
-                                    nameActivity.value = changeActivity(nameActivity.value)
-                                    coroutineScope.launch {
-                                        delay(300)
-                                        isClicked.value = false
-                                    }
-                                },
+                            modifier = Modifier.width(130.dp),
                             contentAlignment = Alignment.Center
                         ) {
+                            // main title
                             Text(
-                                text = nameActivity.value,
-                                color = palette.mainBG,
+                                text = "Create a new ",
+                                color = getActivityColorByName(nameActivity.value, palette),
                                 style = TextStyle(
-                                    fontSize = 16.sp,
+                                    fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
                         }
+
+                            var isClicked = remember { mutableStateOf(false) }
+                            val animatedWidth = animateDpAsState(
+                                targetValue = if (isClicked.value) 90.dp else 80.dp,
+                                label = ""
+                            )
+                            val animatedHeight = animateDpAsState(
+                                targetValue = if (isClicked.value) 35.dp else 30.dp,
+                                label = ""
+                            )
+                            val coroutineScope = rememberCoroutineScope()
+                            Box(
+                                modifier = Modifier
+                                    .height(animatedHeight.value)
+                                    .width(animatedWidth.value)
+                                    .clip(RoundedCornerShape(50.dp))
+                                    .background(getActivityColorByName(nameActivity.value, palette))
+                                    .padding(5.dp)
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null
+                                    )
+                                    {
+                                        isClicked.value = true
+                                        nameActivity.value = changeActivity(nameActivity.value)
+                                        coroutineScope.launch {
+                                            delay(300)
+                                            isClicked.value = false
+                                        }
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = nameActivity.value,
+                                    color = palette.mainBG,
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                        }
                     }
                 }
-            }
-            Box(Modifier.fillMaxWidth().padding(start = 5.dp)){
-                ActivityInfo(palette,nameActivity.value)
+                Box(
+                    Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ActivityInfo(palette, nameActivity.value, mainViewModel)
+                }
             }
         }
     }
 }
 @Composable
-fun ActivityInfo(palette: Palette,nameActivity: String){
-    var titleActivity = remember { mutableStateOf("") }
+fun ActivityInfo(palette: Palette,nameActivity: String,mainViewModel: MainViewModel) {
+    val titleActivity = remember { mutableStateOf("") }
+    val descriptionActivity = remember { mutableStateOf("") }
+    val startDate = remember { mutableStateOf(mainViewModel.getNextDate(nd = 1)) }
+    val endDate = remember { mutableStateOf(mainViewModel.getNextDate(nd = 2)) }
 
-    Column {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        val textWidth = with(LocalDensity.current) {
+            (titleActivity.value.length * 9).dp // 12.dp - базова ширина одного символу
+        }
+        val textHeight = remember { mutableStateOf(50.dp) }
+        val descriptionLines = remember { mutableIntStateOf(0) }
+        val isFocusedTitle = remember { mutableStateOf(false) }
+        val focusRequesterTitle = remember { FocusRequester() }
+        val isFocusedDscp= remember { mutableStateOf(false) }
+        val focusRequesterDscp = remember { FocusRequester() }
+        val lineHeight = 16.sp
+        BasicTextField(
+            value = titleActivity.value,
+            onValueChange = { if (it.length <= 50){
+                val textValue = it.replace("\n", "")
+                titleActivity.value = textValue
+            } },
+            modifier = Modifier
+                .height(40.dp)
+                .width(textWidth.coerceAtLeast(120.dp))
+                .clip(RoundedCornerShape(10.dp))
+                .focusRequester(focusRequesterTitle)
+                .onFocusChanged { focusState ->
+                    isFocusedTitle.value = focusState.isFocused
+                }
+                .border(
+                    width = 2.dp,
+                    color = getActivityColorByName(nameActivity,palette),
+                    shape = RoundedCornerShape(10.dp))
+                .background(if (isFocusedTitle.value) palette.dark else getActivityColorByName(nameActivity,palette)),
+
+            textStyle = TextStyle(
+                fontSize = 14.sp,
+                color = if (isFocusedTitle.value) getActivityColorByName(nameActivity,palette) else palette.mainBG,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center
+            ),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(5.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (titleActivity.value.isEmpty()) {
+                        Text(
+                            text = "Type title...",
+                            color = if (isFocusedTitle.value) getActivityColorByName(nameActivity,palette) else palette.mainBG,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
+        val isClicked = remember { mutableStateOf(false) }
+        val animatedWidth = animateDpAsState(targetValue = if (isClicked.value) 90.dp else 80.dp,
+            label = ""
+        )
+        val animatedHeight = animateDpAsState(targetValue = if (isClicked.value) 35.dp else 30.dp,
+            label = ""
+        )
+        val currentLevel = remember { mutableIntStateOf(1) }
+
+        val coroutineScope = rememberCoroutineScope()
+        Box(
+            modifier = Modifier
+                .height(animatedHeight.value)
+                .width(animatedWidth.value)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                )
+                {
+                    isClicked.value = true
+                    currentLevel.intValue = switchLevel(currentLevel.intValue)
+                    coroutineScope.launch {
+                        delay(300)
+                        isClicked.value = false
+                    }
+                },
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                Modifier
-                    .height(30.dp)
-                    .width(100.dp)
-                    .clip(RoundedCornerShape(50.dp))
-                    .background(getActivityColorByName(nameActivity, palette)),
+            LevelBox(currentLevel.intValue,palette,mainViewModel)
+        }
+        TitleInfo("Description",palette)
+        BasicTextField(
+            value = descriptionActivity.value,
+            onValueChange = { if (it.length <= 300 && descriptionLines.intValue <= 12) { // Перевірка довжини тексту
+                descriptionActivity.value = it
+            } },
+            modifier = Modifier
+                .height(textHeight.value)
+                .width(300.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .focusRequester(focusRequesterDscp)
+                .onFocusChanged { focusState ->
+                    isFocusedDscp.value = focusState.isFocused
+                }
+                .border(
+                    width = 2.dp,
+                    color = getActivityColorByName(nameActivity,palette),
+                    shape = RoundedCornerShape(10.dp))
+                .background(if (isFocusedDscp.value) palette.dark else getActivityColorByName(nameActivity,palette)),
+            textStyle = TextStyle(
+                color = if (isFocusedDscp.value) getActivityColorByName(nameActivity,palette) else palette.mainBG,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            ),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(5.dp),
+                    contentAlignment = Alignment.TopStart
+                ) {
+                    if (descriptionActivity.value.isEmpty()) {
+                        Text(
+                            text = "Type description...",
+                            color = if (isFocusedDscp.value) getActivityColorByName(nameActivity,palette) else palette.mainBG,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        )
+                    }
+                    innerTextField()
+                }
+            },
+            onTextLayout = { textLayoutResult ->
+                // Обчислюємо кількість рядків
+                descriptionLines.intValue = textLayoutResult.lineCount
+                val calculatedHeight = (lineHeight.value * descriptionLines.intValue).dp + 32.dp // Динамічна висота контейнера
+                textHeight.value = maxOf(calculatedHeight, 50.dp) // Гарантуємо мінімум 50.dp
+            }
+        )
+
+        TitleInfo("Duration",palette)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(modifier = Modifier
+                .width(50.dp)
+                .height(30.dp)
+                .clip(RoundedCornerShape(5.dp))
+                .background(getActivityColorByName(nameActivity,palette)),
                 contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text = "FROM",
+                    color = palette.mainBG,
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+            }
+            Text(
+                text = ":",
+                color = getActivityColorByName(nameActivity,palette),
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Title",
-                    color = palette.mainBG,
+                    text = startDate.value.getDateTxtFormat(mainViewModel),
+                    color = getActivityColorByName(nameActivity,palette),
                     style = TextStyle(
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+                IconButton(
+                    onClick = { },
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(50.dp))
+                        .padding(0.dp)
+                        .background(getActivityColorByName(nameActivity,palette))
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.switch_icon),
+                        contentDescription = "switch date",
+                        tint = palette.mainBG,
+                        modifier = Modifier
+                            .size(16.dp)
+                    )
+                }
+                Text(
+                    text = mainViewModel.getTimeFormat(startDate.value.minutes,startDate.value.hour),
+                    color = getActivityColorByName(nameActivity,palette),
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
                     )
                 )
             }
-            Box(
-                Modifier
-                    .height(30.dp)
-                    .width(20.dp),
+
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(modifier = Modifier
+                .width(50.dp)
+                .height(30.dp)
+                .clip(RoundedCornerShape(5.dp))
+                .background(getActivityColorByName(nameActivity,palette)),
                 contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text = "TO",
+                    color = palette.mainBG,
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+            }
+            Text(
+                text = ":",
+                color = getActivityColorByName(nameActivity,palette),
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = ":",
-                    color = palette.whiteColor,
+                    text = endDate.value.getDateTxtFormat(mainViewModel),
+                    color = getActivityColorByName(nameActivity,palette),
                     style = TextStyle(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+                IconButton(
+                    onClick = { },
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(50.dp))
+                        .padding(0.dp)
+                        .background(getActivityColorByName(nameActivity,palette))
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.switch_icon),
+                        contentDescription = "switch date",
+                        tint = palette.mainBG,
+                        modifier = Modifier
+                            .size(16.dp)
+                    )
+                }
+                Text(
+                    text = mainViewModel.getTimeFormat(endDate.value.minutes,endDate.value.hour),
+                    color = getActivityColorByName(nameActivity,palette),
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
                     )
                 )
             }
-            val textWidth = with(LocalDensity.current) {
-                (titleActivity.value.length * 12).dp // 12.dp - базова ширина одного символу
-            }
-            TextField(
-                value = titleActivity.value,
-                onValueChange = { titleActivity.value = it },
-                modifier = Modifier
-                    .width(textWidth.coerceAtLeast(80.dp))
-                    .height(40.dp)
-                    .clip(RoundedCornerShape(50.dp))
-                    .background(getActivityColorByName(nameActivity, palette)),
-                placeholder = { Text(
-                    text = "Type Title",
-                    textStyle = TextStyle(
-                    color = palette.mainBG,
-                    fontSize = 12.sp, // Розмір тексту, який підходить для обмеженої висоти
-                    lineHeight = 18.sp, // Лінійна висота для візуальної чіткості
-                    textAlign = TextAlign.Start,
-                    fontWeight = FontWeight.Bold
-                ),) },
-                textStyle = TextStyle(
-                    color = palette.mainBG,
-                    fontSize = 12.sp, // Розмір тексту, який підходить для обмеженої висоти
-                    lineHeight = 18.sp, // Лінійна висота для візуальної чіткості
-                    textAlign = TextAlign.Start,
-                    fontWeight = FontWeight.Bold
-                ),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                singleLine = true,
+
+        }
+        val textDifference = remember { mutableStateOf(mainViewModel.calculateTimeDifference(startDate.value,endDate.value)) }
+        val textDifferenceWidth = with(LocalDensity.current) {
+            (textDifference.value.length * 9).dp // 12.dp - базова ширина одного символу
+        }
+        Box(modifier = Modifier
+            .height(30.dp)
+            .width(textDifferenceWidth.coerceAtLeast(90.dp))
+            .clip(RoundedCornerShape(50.dp))
+            .background(getActivityColorByName(nameActivity,palette)),
+            contentAlignment = Alignment.Center
+        ){
+
+            Text(
+                text = textDifference.value,
+                color = palette.mainBG,
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
             )
         }
     }
 }
 
+@Composable
+fun TitleInfo(text: String,palette: Palette){
+    Box(
+        Modifier
+            .height(30.dp)
+            .width(100.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = palette.whiteColor,
+            style = TextStyle(
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+    }
+}
+fun switchLevel(level: Int): Int{
+    return if (level == 5) 1 else level + 1
+}
 fun changeActivity(name: String): String{
     return if (name == "Task") "Event" else "Task"
 }

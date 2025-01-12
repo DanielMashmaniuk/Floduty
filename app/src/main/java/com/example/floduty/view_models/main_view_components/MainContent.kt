@@ -16,6 +16,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +35,7 @@ import com.example.floduty.view_models.main_view_components.main_content_compone
 
 @Composable
 fun MainContent(currentYear: Int, currentMonth : Int,currentDay: Int,palette: Palette,mainViewModel: MainViewModel) {
+    val isCreateActivityWindowVisible = remember { mutableStateOf(false) }
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -63,7 +67,8 @@ fun MainContent(currentYear: Int, currentMonth : Int,currentDay: Int,palette: Pa
                 currentMonth = currentMonth,
                 currentDay = currentDay,
                 palette = palette,
-                mainViewModel = mainViewModel
+                mainViewModel = mainViewModel,
+                isCreateActivityWindowVisible
             )
         }
         Box(
@@ -80,6 +85,6 @@ fun MainContent(currentYear: Int, currentMonth : Int,currentDay: Int,palette: Pa
             }
         }
     }
-    CreateNewTaskBox(palette)
+    CreateNewTaskBox(palette,mainViewModel,isCreateActivityWindowVisible)
 
 }
