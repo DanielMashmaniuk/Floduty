@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,11 +23,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,11 +57,12 @@ import com.example.floduty.ui.theme.Palette
 import com.example.floduty.view_models.main_view_components.main_content_components.LevelBox
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.LocalTime
 
 @Composable
 fun CreateNewTaskBox(palette: Palette,mainViewModel: MainViewModel,isCreateActivityWindowVisible: MutableState<Boolean>) {
     val nameActivity = remember { mutableStateOf("Task") }
+
+    val isTimeSwitcherWindowVisible = remember { mutableStateOf(Pair("none",mainViewModel.startDate)) }
     AnimatedVisibility(
         visible = isCreateActivityWindowVisible.value,
         enter = fadeIn() + expandVertically(),  // Ефект появи
@@ -94,12 +98,13 @@ fun CreateNewTaskBox(palette: Palette,mainViewModel: MainViewModel,isCreateActiv
                 }
             }
             // choose time screen
-            Box(Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .height(100.dp)
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .height(100.dp)
 
-            ){
+            ) {
 
             }
             //main column container
@@ -115,7 +120,7 @@ fun CreateNewTaskBox(palette: Palette,mainViewModel: MainViewModel,isCreateActiv
                 ) {
 
                     // label column
-                    Row (
+                    Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(0.dp)
                     ) {
@@ -134,45 +139,45 @@ fun CreateNewTaskBox(palette: Palette,mainViewModel: MainViewModel,isCreateActiv
                             )
                         }
 
-                            var isClicked = remember { mutableStateOf(false) }
-                            val animatedWidth = animateDpAsState(
-                                targetValue = if (isClicked.value) 90.dp else 80.dp,
-                                label = ""
-                            )
-                            val animatedHeight = animateDpAsState(
-                                targetValue = if (isClicked.value) 35.dp else 30.dp,
-                                label = ""
-                            )
-                            val coroutineScope = rememberCoroutineScope()
-                            Box(
-                                modifier = Modifier
-                                    .height(animatedHeight.value)
-                                    .width(animatedWidth.value)
-                                    .clip(RoundedCornerShape(50.dp))
-                                    .background(getActivityColorByName(nameActivity.value, palette))
-                                    .padding(5.dp)
-                                    .clickable(
-                                        interactionSource = remember { MutableInteractionSource() },
-                                        indication = null
-                                    )
-                                    {
-                                        isClicked.value = true
-                                        nameActivity.value = changeActivity(nameActivity.value)
-                                        coroutineScope.launch {
-                                            delay(300)
-                                            isClicked.value = false
-                                        }
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = nameActivity.value,
-                                    color = palette.mainBG,
-                                    style = TextStyle(
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                        val isClicked = remember { mutableStateOf(false) }
+                        val animatedWidth = animateDpAsState(
+                            targetValue = if (isClicked.value) 90.dp else 80.dp,
+                            label = ""
+                        )
+                        val animatedHeight = animateDpAsState(
+                            targetValue = if (isClicked.value) 35.dp else 30.dp,
+                            label = ""
+                        )
+                        val coroutineScope = rememberCoroutineScope()
+                        Box(
+                            modifier = Modifier
+                                .height(animatedHeight.value)
+                                .width(animatedWidth.value)
+                                .clip(RoundedCornerShape(50.dp))
+                                .background(getActivityColorByName(nameActivity.value, palette))
+                                .padding(5.dp)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
                                 )
+                                {
+                                    isClicked.value = true
+                                    nameActivity.value = changeActivity(nameActivity.value)
+                                    coroutineScope.launch {
+                                        delay(300)
+                                        isClicked.value = false
+                                    }
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = nameActivity.value,
+                                color = palette.mainBG,
+                                style = TextStyle(
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
                         }
                     }
                 }
@@ -181,18 +186,46 @@ fun CreateNewTaskBox(palette: Palette,mainViewModel: MainViewModel,isCreateActiv
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    ActivityInfo(palette, nameActivity.value, mainViewModel)
+                    ActivityInfo(
+                        palette,
+                        nameActivity.value,
+                        mainViewModel.startDate,
+                        mainViewModel.endDate,
+                        isTimeSwitcherWindowVisible,
+                        mainViewModel
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                TimeSwitcher(palette,mainViewModel,isTimeSwitcherWindowVisible){
+                    if (it.first == "F") {
+                        mainViewModel.startDate.value = it.second
+                        isTimeSwitcherWindowVisible.value = Pair("none", mainViewModel.startDate)
+                    }else{
+                        mainViewModel.endDate.value = it.second
+                        isTimeSwitcherWindowVisible.value = Pair("none", mainViewModel.startDate)
+                    }
                 }
             }
         }
     }
 }
 @Composable
-fun ActivityInfo(palette: Palette,nameActivity: String,mainViewModel: MainViewModel) {
+fun ActivityInfo(
+    palette: Palette,
+    nameActivity: String,
+    startDate: MutableState<DateAndTime>,
+    endDate:MutableState<DateAndTime>,
+    isTimeSwitcherWindowVisible: MutableState<Pair<String,MutableState<DateAndTime>>>,
+    mainViewModel: MainViewModel)
+{
     val titleActivity = remember { mutableStateOf("") }
     val descriptionActivity = remember { mutableStateOf("") }
-    val startDate = remember { mutableStateOf(mainViewModel.getNextDate(nd = 1)) }
-    val endDate = remember { mutableStateOf(mainViewModel.getNextDate(nd = 2)) }
+
 
 
     Column(
@@ -381,7 +414,7 @@ fun ActivityInfo(palette: Palette,nameActivity: String,mainViewModel: MainViewMo
                     )
                 )
                 IconButton(
-                    onClick = { },
+                    onClick = { isTimeSwitcherWindowVisible.value = Pair("F",startDate)},
                     modifier = Modifier
                         .size(30.dp)
                         .clip(RoundedCornerShape(50.dp))
@@ -449,7 +482,7 @@ fun ActivityInfo(palette: Palette,nameActivity: String,mainViewModel: MainViewMo
                     )
                 )
                 IconButton(
-                    onClick = { },
+                    onClick = {isTimeSwitcherWindowVisible.value = Pair("T",endDate) },
                     modifier = Modifier
                         .size(30.dp)
                         .clip(RoundedCornerShape(50.dp))
@@ -475,7 +508,11 @@ fun ActivityInfo(palette: Palette,nameActivity: String,mainViewModel: MainViewMo
             }
 
         }
-        val textDifference = remember { mutableStateOf(mainViewModel.calculateTimeDifference(startDate.value,endDate.value)) }
+        val textDifference = remember(startDate.value, endDate.value) {
+            derivedStateOf {
+                mainViewModel.calculateTimeDifference(startDate.value, endDate.value)
+            }
+        }
         val textDifferenceWidth = with(LocalDensity.current) {
             (textDifference.value.length * 9).dp // 12.dp - базова ширина одного символу
         }
@@ -498,7 +535,161 @@ fun ActivityInfo(palette: Palette,nameActivity: String,mainViewModel: MainViewMo
         }
     }
 }
+@Composable
+fun TimeSwitcher(
+    palette: Palette,
+    mainViewModel: MainViewModel,
+    data: MutableState<Pair<String,MutableState<DateAndTime>>>,
+    onTimeSelected: (Pair<String,DateAndTime>) -> Unit
+) {
+    // Створення стану для збереження часу
+    val year = remember { mutableIntStateOf(data.value.second.value.year) } // Початкове значення для годин
+    val month = remember { mutableIntStateOf(data.value.second.value.month) } // Початкове значення для годин
+    val day = remember { mutableIntStateOf(data.value.second.value.day) } // Початкове значення для годин
+    val hours = remember { mutableIntStateOf(data.value.second.value.hour) } // Початкове значення для годин
+    val minutes = remember { mutableIntStateOf(data.value.second.value.minutes) } // Початкове значення для хвилин
+    AnimatedVisibility(
+        visible = if (data.value.first == "none") false else true,
+        enter = fadeIn() + expandVertically(),  // Ефект появи
+        exit = fadeOut() + shrinkVertically()   // Ефект зникнення
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(horizontal = 10.dp)
+                .shadow(8.dp, shape = RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(20.dp))
+                .background(palette.lightGaryBG)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Вибір годин і хвилин
+                Row(
+                    Modifier.height(150.dp).padding(top = 30.dp, start = 15.dp, end = 15.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    ChoosedSection(2100, year, palette, mainViewModel)
+                    ChoosedSection(13, month, palette, mainViewModel, true, false)
+                    ChoosedSection(
+                        mainViewModel.getDaysInMonth(year.intValue, month.intValue) + 1,
+                        day,
+                        palette,
+                        mainViewModel,
+                        containZero = false
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ChoosedSection(24, hours, palette, mainViewModel)
+                        Text(
+                            text = ":",
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = palette.whiteColor
+                            )
+                        )
+                        ChoosedSection(60, minutes, palette, mainViewModel)
+                    }
+                }
+                Box(Modifier.fillMaxWidth().padding(5.dp).height(30.dp), contentAlignment = Alignment.Center) {
+                    Row {
+                        IconButton(onClick = {
+                            onTimeSelected(
+                                Pair(data.value.first,data.value.second.value)
+                            )
+                        }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.close_square),
+                                contentDescription = "Increase hours",
+                                tint = palette.hardColor,
+                                modifier = Modifier
+                                    .size(24.dp)
+                            )
+                        }
+                        IconButton(onClick = {
+                            onTimeSelected(
+                                Pair(data.value.first,DateAndTime(
+                                    year.intValue,
+                                    month.intValue,
+                                    day.intValue,
+                                    hours.intValue,
+                                    minutes.intValue
+                                ))
+                            )
+                        }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.done_ring_round),
+                                contentDescription = "Increase hours",
+                                tint = palette.primaryColor,
+                                modifier = Modifier
+                                    .size(24.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@Composable
+fun ChoosedSection(endIdx: Int,value : MutableState<Int>,palette: Palette,mainViewModel: MainViewModel,isMonth : Boolean = false,containZero: Boolean = true){
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        IconButton(onClick = {
 
+            value.value = (value.value + 1) % endIdx
+            if (!containZero && value.value == 0) {
+                value.value = 1
+            }
+
+        }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_up),
+                contentDescription = "Increase hours",
+                tint = palette.whiteColor,
+                modifier = Modifier
+                    .size(18.dp)
+            )
+        }
+        val text = if (containZero) value.value.toString().padStart(2, '0') else value.value.toString()
+        Text(
+            text = if (isMonth) mainViewModel.getMonthsNameByNumber(value.value) else text,
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = palette.whiteColor
+            )
+        )
+        IconButton(onClick = {
+            value.value = if (containZero) {
+                (value.value - 1 + endIdx) % endIdx
+            } else {
+                val v = (value.value - 1 + endIdx) % endIdx
+                if (v == 0) endIdx - 1 else v
+            }
+
+        }) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_down),
+                contentDescription = "Decrease hours",
+                tint = palette.whiteColor,
+                modifier = Modifier
+                    .size(18.dp)
+            )
+        }
+    }
+}
 @Composable
 fun TitleInfo(text: String,palette: Palette){
     Box(

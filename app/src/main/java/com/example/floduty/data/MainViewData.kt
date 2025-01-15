@@ -1,6 +1,7 @@
 package com.example.floduty.data
 
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.example.floduty.data.models.Task
@@ -10,6 +11,7 @@ import com.example.floduty.ui.theme.Palette
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
@@ -20,6 +22,10 @@ class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
     var currentDay = mutableIntStateOf(getCurrentDay())
     val currentHour = mutableIntStateOf(getCurrentHour())
     val currentMinute = mutableIntStateOf(getCurrentMinute())
+
+    val startDate = mutableStateOf(getNextDate(nd = 1))
+    val endDate = mutableStateOf(getNextDate(nd = 2))
+
     private val nameMonthByNumber = mapOf(
         1 to "January",
         2 to "February",
@@ -162,7 +168,9 @@ class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
         return DateAndTime(
             year = date.year,
             month = date.month,
-            day = date.day
+            day = date.day,
+            hour = date.hour,
+            minutes = date.minutes
         )
     }
     fun calculateTimeDifference(startDate: DateAndTime, endDate: DateAndTime): String {
@@ -178,22 +186,38 @@ class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
         val totalHours = totalMinutes / 60
         val days = totalHours / 24
         val months = ChronoUnit.MONTHS.between(start.withDayOfMonth(1), end.withDayOfMonth(1))
-
+        val years = months / 12
+        val remainingMonths = months % 12
         val remainingDays = days % 30
         val remainingHours = totalHours % 24
         val remainingMinutes = totalMinutes % 60
 
-        // Формування рядка результату
-        val result = buildString {
-            if (months > 0) append("Months: $months, ")
-            if (remainingDays > 0) append("Days: $remainingDays, ")
-            if (remainingHours > 0) append("Hours: $remainingHours, ")
-            if (remainingMinutes > 0) append("Minutes: $remainingMinutes")
+        // Функція для отримання правильної форми
+        fun pluralize(value: Long, singular: String, plural: String): String {
+            return if (value == 1L) "$value $singular" else "$value $plural"
         }
 
-        // Видалення зайвого коми, якщо є
-        return result.trimEnd { it == ',' || it == ' ' }
+        // Формування результату
+        return when {
+            years > 0 && remainingMonths > 0 -> "${pluralize(years, "year", "years")}, ${pluralize(remainingMonths, "month", "months")}"
+            years > 0 -> pluralize(years, "year", "years")
+            months > 0 && remainingDays > 0 -> "${pluralize(months, "month", "months")}, ${pluralize(remainingDays, "day", "days")}"
+            months > 0 -> pluralize(months, "month", "months")
+            days > 0 && remainingHours > 0 -> "${pluralize(days, "day", "days")}, ${pluralize(remainingHours, "hour", "hours")}"
+            days > 0 -> pluralize(days, "day", "days")
+            remainingHours > 0 && remainingMinutes > 0 -> "${pluralize(remainingHours, "hour", "hours")}, ${pluralize(remainingMinutes, "minute", "minutes")}"
+            remainingHours > 0 -> pluralize(remainingHours, "hour", "hours")
+            remainingMinutes > 0 -> pluralize(remainingMinutes, "minute", "minutes")
+            else -> "Invalid Time"
+        }
     }
+
+
+    fun getDaysInMonth(year: Int, month: Int): Int {
+        return YearMonth.of(year, month).lengthOfMonth()
+    }
+
+
 }
 
 fun getCurrentMonth(): Int {

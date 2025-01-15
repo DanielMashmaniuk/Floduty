@@ -24,6 +24,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,11 +42,15 @@ import java.time.YearMonth
 
 @Composable
 fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int,currentDay: Int,palette: Palette,isCalendarVisible: MutableState<Boolean>){
+
     AnimatedVisibility(
         visible = isCalendarVisible.value,
         enter = fadeIn() + expandVertically(),  // Ефект появи
         exit = fadeOut() + shrinkVertically()   // Ефект зникнення
     ) {
+        val monthCalendar = remember { mutableStateOf(currentMonth) }
+        val yearCalendar = remember { mutableStateOf(currentYear) }
+
         Box(
             modifier = Modifier
                 .width(300.dp)
@@ -53,7 +59,7 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
                 .background(palette.secondBG)
         ) {
 
-            CustomCalendar(currentYear, currentMonth, currentDay, palette, mainViewModel)
+            CustomCalendar(yearCalendar.value, monthCalendar.value, currentDay, palette, mainViewModel)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -65,7 +71,9 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = { mainViewModel.setCurrentDay() },
+                        onClick = {
+
+                        },
                         modifier = Modifier.size(40.dp)
                     ) {
                         Icon(
@@ -82,7 +90,11 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
                     ) {
                         // Previous Button
                         IconButton(
-                            onClick = { mainViewModel.setPreviousMonth() },
+                            onClick = {
+                                val dateCalendar = setPreviousMonthCalendar(monthCalendar.value,yearCalendar.value)
+                                monthCalendar.value = dateCalendar.second
+                                yearCalendar.value = dateCalendar.first
+                            },
                             modifier = Modifier.size(40.dp)
                         ) {
                             Icon(
@@ -95,7 +107,7 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
 
                         // Month and Year Text
                         Text(
-                            text = "${mainViewModel.getMonthsNameByNumber(mainViewModel.currentMonth.intValue)}, ${mainViewModel.currentYear.intValue}",
+                            text = "${mainViewModel.getMonthsNameByNumber(monthCalendar.value)}, ${yearCalendar.value}",
                             color = palette.primaryColor,
                             style = TextStyle(
                                 fontSize = 16.sp,
@@ -105,7 +117,11 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
 
                         // Next Button
                         IconButton(
-                            onClick = { mainViewModel.setNextMonth() },
+                            onClick = {
+                                val dateCalendar = setNextMonthCalendar(monthCalendar.value,yearCalendar.value)
+                                monthCalendar.value = dateCalendar.second
+                                yearCalendar.value = dateCalendar.first
+                            },
                             modifier = Modifier.size(40.dp)
                         ) {
                             Icon(
@@ -178,6 +194,26 @@ fun CustomCalendar(year: Int,month: Int,currentDay: Int, palette: Palette, mainV
                 }
             }
         }
+    }
+}
+fun setPreviousMonthCalendar(month: Int,year: Int): Pair<Int,Int> {
+    if (month == 1) {
+        val newMonth = 12
+        val newYear = year - 1
+        return Pair(newYear,newMonth)
+    } else {
+        val newMonth = month - 1
+        return Pair(year,newMonth)
+    }
+}
+fun setNextMonthCalendar(month: Int,year: Int): Pair<Int,Int> {
+    if (month == 12) {
+        val newMonth = 1
+        val newYear = year + 1
+        return Pair(newYear,newMonth)
+    } else {
+        val newMonth = month + 1
+        return Pair(year,newMonth)
     }
 }
 fun getDaysOfMonth(year: Int,month: Int): Int{
