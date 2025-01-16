@@ -9,9 +9,16 @@ class Palette(
     val dark: Color = Color(0xFF121515),
 
     val lightGaryBG: Color = Color(0xFF272727),
+    val lightGaryAlphaBG: Color = Color(0x99272727),
+
     val primaryColor: Color = Color(0xFF015710),
-    val orangeColor: Color = Color(0xFFE06123),
+    val eventColor: Color = Color(0xFF697565),
+    val sageColor: Color = Color(0xFF859F3D),
+    val orangeColor: Color = Color(0xFFFD8B51),
+
     val whiteColor: Color = Color(0xFFFFDAC6),
+    val noteColor: Color = Color(0xFFFDD835),
+
     val transparentColor: Color = Color(0x00FFDAC6),
 
     val simpleLevelColor: Color = Color(0xFF00ACC1),

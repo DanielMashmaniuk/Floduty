@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.example.floduty.view_models.main_view_components.main_content_components.nav_functions
 
 import androidx.compose.animation.AnimatedVisibility
@@ -6,6 +8,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,16 +16,21 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,6 +50,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -63,6 +72,7 @@ fun CreateNewTaskBox(palette: Palette,mainViewModel: MainViewModel,isCreateActiv
     val nameActivity = remember { mutableStateOf("Task") }
 
     val isTimeSwitcherWindowVisible = remember { mutableStateOf(Pair("none",mainViewModel.startDate)) }
+
     AnimatedVisibility(
         visible = isCreateActivityWindowVisible.value,
         enter = fadeIn() + expandVertically(),  // Ефект появи
@@ -70,114 +80,118 @@ fun CreateNewTaskBox(palette: Palette,mainViewModel: MainViewModel,isCreateActiv
     ) {
         Box(
             modifier = Modifier
-                .height(600.dp)
-                .width(350.dp)
-                .shadow(8.dp, shape = RoundedCornerShape(20.dp)) // Тінь із закругленими краями
-                .clip(RoundedCornerShape(20.dp))
-                .background(palette.dark)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .background(palette.dark),
         ) {
-            // cancel button
-            Box(
-                Modifier.fillMaxWidth().height(45.dp).padding(top = 15.dp, end = 15.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                IconButton(
-                    onClick = {
-                        isCreateActivityWindowVisible.value =
-                            !isCreateActivityWindowVisible.value
-                    },
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.more_unfold),
-                        contentDescription = "back",
-                        tint = getActivityColorByName(nameActivity.value, palette),
-                        modifier = Modifier
-                            .size(28.dp)
-                    )
-                }
-            }
-            // choose time screen
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .height(100.dp)
 
-            ) {
-
-            }
             //main column container
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
+
                 Box(
                     Modifier
                         .fillMaxWidth()
                         .height(80.dp),
                     contentAlignment = Alignment.Center
                 ) {
-
                     // label column
-                    Row(
+                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(0.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        // Space -- button
                         Box(
-                            modifier = Modifier.width(130.dp),
-                            contentAlignment = Alignment.Center
+                            Modifier.size(30.dp)
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(0.dp)
                         ) {
-                            // main title
-                            Text(
-                                text = "Create a new ",
-                                color = getActivityColorByName(nameActivity.value, palette),
-                                style = TextStyle(
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold
+                            Box(
+                                modifier = Modifier.width(130.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                // main title
+                                Text(
+                                    text = "Create a new ",
+                                    color = getActivityColorByName(nameActivity.value, palette),
+                                    style = TextStyle(
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
                                 )
-                            )
-                        }
+                            }
 
-                        val isClicked = remember { mutableStateOf(false) }
-                        val animatedWidth = animateDpAsState(
-                            targetValue = if (isClicked.value) 90.dp else 80.dp,
-                            label = ""
-                        )
-                        val animatedHeight = animateDpAsState(
-                            targetValue = if (isClicked.value) 35.dp else 30.dp,
-                            label = ""
-                        )
-                        val coroutineScope = rememberCoroutineScope()
-                        Box(
-                            modifier = Modifier
-                                .height(animatedHeight.value)
-                                .width(animatedWidth.value)
-                                .clip(RoundedCornerShape(50.dp))
-                                .background(getActivityColorByName(nameActivity.value, palette))
-                                .padding(5.dp)
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                )
-                                {
-                                    isClicked.value = true
-                                    nameActivity.value = changeActivity(nameActivity.value)
-                                    coroutineScope.launch {
-                                        delay(300)
-                                        isClicked.value = false
-                                    }
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = nameActivity.value,
-                                color = palette.mainBG,
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                            val isClicked = remember { mutableStateOf(false) }
+                            val animatedWidth = animateDpAsState(
+                                targetValue = if (isClicked.value) 90.dp else 80.dp,
+                                label = ""
                             )
+                            val animatedHeight = animateDpAsState(
+                                targetValue = if (isClicked.value) 35.dp else 30.dp,
+                                label = ""
+                            )
+                            val coroutineScope = rememberCoroutineScope()
+                            Box(
+                                modifier = Modifier
+                                    .height(animatedHeight.value)
+                                    .width(animatedWidth.value)
+                                    .clip(RoundedCornerShape(50.dp))
+                                    .background(getActivityColorByName(nameActivity.value, palette))
+                                    .padding(5.dp)
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null
+                                    )
+                                    {
+                                        isClicked.value = true
+                                        nameActivity.value = changeActivity(nameActivity.value)
+                                        coroutineScope.launch {
+                                            delay(300)
+                                            isClicked.value = false
+                                        }
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = nameActivity.value,
+                                    color = palette.mainBG,
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            }
+                        }
+                        // cancel button
+                        Box(
+                            Modifier.width(30.dp).height(30.dp),
+                            contentAlignment = Alignment.TopEnd
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    if (mainViewModel.isNotePanelVisible.value){
+                                        mainViewModel.isNotePanelVisible.value = false
+                                    }
+                                    if (isTimeSwitcherWindowVisible.value.first != "none"){
+                                        isTimeSwitcherWindowVisible.value = Pair("none",mainViewModel.startDate)
+                                    }
+                                    isCreateActivityWindowVisible.value =
+                                        !isCreateActivityWindowVisible.value
+                                },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.more_unfold),
+                                    contentDescription = "back",
+                                    tint = getActivityColorByName(nameActivity.value, palette),
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -197,8 +211,8 @@ fun CreateNewTaskBox(palette: Palette,mainViewModel: MainViewModel,isCreateActiv
                 }
             }
 
-            Box(
-                modifier = Modifier.fillMaxSize(),
+            Box (
+                modifier = Modifier.height(getScreenHeight().dp),
                 contentAlignment = Alignment.Center
             ) {
                 TimeSwitcher(palette,mainViewModel,isTimeSwitcherWindowVisible){
@@ -210,6 +224,7 @@ fun CreateNewTaskBox(palette: Palette,mainViewModel: MainViewModel,isCreateActiv
                         isTimeSwitcherWindowVisible.value = Pair("none", mainViewModel.startDate)
                     }
                 }
+                WriteNotePanel(palette,mainViewModel)
             }
         }
     }
@@ -322,9 +337,15 @@ fun ActivityInfo(
         TitleInfo("Description",palette)
         BasicTextField(
             value = descriptionActivity.value,
-            onValueChange = { if (it.length <= 300 && descriptionLines.intValue <= 12) { // Перевірка довжини тексту
-                descriptionActivity.value = it
-            } },
+            onValueChange = { newText ->
+                val isWithinMaxLength = newText.length <= 300
+                val isDeleting = newText.length < descriptionActivity.value.length
+                val isWithinMaxLines = descriptionLines.intValue <= 12 || isDeleting
+
+                if (isWithinMaxLength && isWithinMaxLines) {
+                    descriptionActivity.value = newText
+                }
+            },
             modifier = Modifier
                 .height(textHeight.value)
                 .width(300.dp)
@@ -414,7 +435,12 @@ fun ActivityInfo(
                     )
                 )
                 IconButton(
-                    onClick = { isTimeSwitcherWindowVisible.value = Pair("F",startDate)},
+                    onClick = {
+                        if (mainViewModel.isNotePanelVisible.value){
+                            mainViewModel.isNotePanelVisible.value = false
+                        }
+                        isTimeSwitcherWindowVisible.value = Pair("F",startDate)
+                              },
                     modifier = Modifier
                         .size(30.dp)
                         .clip(RoundedCornerShape(50.dp))
@@ -482,7 +508,11 @@ fun ActivityInfo(
                     )
                 )
                 IconButton(
-                    onClick = {isTimeSwitcherWindowVisible.value = Pair("T",endDate) },
+                    onClick = {
+                        if (mainViewModel.isNotePanelVisible.value){
+                            mainViewModel.isNotePanelVisible.value = false
+                        }
+                        isTimeSwitcherWindowVisible.value = Pair("T",endDate) },
                     modifier = Modifier
                         .size(30.dp)
                         .clip(RoundedCornerShape(50.dp))
@@ -532,6 +562,183 @@ fun ActivityInfo(
                     fontWeight = FontWeight.Medium
                 )
             )
+        }
+        TitleInfo("Notes",palette)
+        Box(Modifier
+            .fillMaxWidth()
+            .height(150.dp)
+            .padding(horizontal = 10.dp)
+            .clip(RoundedCornerShape(25.dp))
+            .verticalScroll(rememberScrollState())
+            .background(palette.lightGaryBG),
+        ) {
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                mainViewModel.notes.forEach { note ->
+                    NoteBox(palette, note) {
+                        mainViewModel.notes.removeAt(mainViewModel.notes.indexOf(it))
+                    }
+                }
+                IconButton(
+                    onClick = {
+                        if (isTimeSwitcherWindowVisible.value.first != "none"){
+                            isTimeSwitcherWindowVisible.value = Pair("none",mainViewModel.startDate)
+                        }
+                        mainViewModel.isNotePanelVisible.value = !mainViewModel.isNotePanelVisible.value
+                              },
+                    modifier = Modifier
+                        .size(25.dp)
+                        .clip(RoundedCornerShape(50.dp))
+                        .padding(0.dp)
+                        .background(palette.orangeColor)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.add_svgrepo_com),
+                        contentDescription = "add note",
+                        tint = palette.lightGaryBG,
+                        modifier = Modifier
+                            .size(14.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+@Composable
+fun WriteNotePanel(palette: Palette,mainViewModel: MainViewModel){
+    val noteText = remember { mutableStateOf("") }
+    val textWidth = with(LocalDensity.current) {
+        (noteText.value.length * 15).dp // 12.dp - базова ширина одного символу
+    }
+    AnimatedVisibility(
+        visible = mainViewModel.isNotePanelVisible.value,
+        enter = fadeIn() + expandVertically(),  // Ефект появи
+        exit = fadeOut() + shrinkVertically()   // Ефект зникнення
+    ) {
+        Box(Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .padding(horizontal = 10.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .background(palette.lightGaryBG),
+            contentAlignment = Alignment.Center
+        ) {
+            Row (
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BasicTextField(
+                    value = noteText.value,
+                    onValueChange = {
+                        if (it.length <= 35) {
+                            val textValue = it.replace("\n", "")
+                            noteText.value = textValue
+                        }
+                    },
+                    modifier = Modifier
+                        .height(40.dp)
+                        .width(textWidth.coerceAtLeast(150.dp).coerceAtMost(300.dp))
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(palette.lightGaryBG),
+
+                    textStyle = TextStyle(
+                        fontSize = 16.sp,
+                        color = palette.mainBG,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
+                    ),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(5.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (noteText.value.isEmpty()) {
+                                Text(
+                                    text = "Type note...",
+                                    color = palette.mainBG,
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
+                )
+                IconButton(
+                    onClick = {
+                        if (noteText.value.isNotEmpty()){
+                            mainViewModel.notes.add(noteText.value)
+                        }
+                        mainViewModel.isNotePanelVisible.value = !mainViewModel.isNotePanelVisible.value
+                        noteText.value = ""
+                    },
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(RoundedCornerShape(50.dp))
+                        .padding(0.dp)
+                        .background(palette.orangeColor)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.add_svgrepo_com ),
+                        contentDescription = "add note",
+                        tint = palette.lightGaryBG,
+                        modifier = Modifier
+                            .size(16.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+@Composable
+fun NoteBox(palette: Palette,note: String, onDeletedNote: (String) -> Unit){
+    val textNoteWidth = with(LocalDensity.current) {
+        (note.length * 12).dp
+    }
+    Box(Modifier
+        .width(textNoteWidth.coerceAtLeast(80.dp).coerceAtMost(150.dp))
+        .height(25.dp)
+        .clip(RoundedCornerShape(25.dp))
+        .background(palette.orangeColor),
+        contentAlignment = Alignment.Center
+    ){
+        Row(modifier = Modifier.fillMaxSize().padding(horizontal = 5.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = if (note.length > 14) "${note.take(11)}..." else note,
+                color = palette.mainBG,
+                style = TextStyle(
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            )
+            IconButton(
+                onClick = { onDeletedNote(note) },
+                modifier = Modifier
+                    .size(16.dp)
+                    .clip(RoundedCornerShape(50.dp))
+                    .padding(0.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.close),
+                    contentDescription = "switch date",
+                    tint = palette.mainBG,
+                    modifier = Modifier
+                        .size(13.dp)
+                )
+            }
         }
     }
 }
@@ -718,6 +925,11 @@ fun getActivityColorByName(name: String,palette: Palette): Color{
     return if (name == "Task"){
         palette.primaryColor
     }else{
-        palette.orangeColor
+        palette.eventColor
     }
+}
+@Composable
+fun getScreenHeight(): Int {
+    val configuration = LocalConfiguration.current
+    return configuration.screenHeightDp
 }

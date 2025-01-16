@@ -1,4 +1,5 @@
 [versions]
+accompanistFlowlayout = "<latest_version>"
 agp = "8.7.3"
 androidxCompiler = "1.5.15"
 androidxUi = "1.7.6"
@@ -27,6 +28,7 @@ uiTooling = "1.7.6"
 uiToolingPreview = "1.7.6"
 
 [libraries]
+accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanistFlowlayout" }
 androidx-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "androidxCompiler" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }

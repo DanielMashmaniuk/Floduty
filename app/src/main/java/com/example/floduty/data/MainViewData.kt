@@ -1,7 +1,9 @@
 package com.example.floduty.data
 
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.example.floduty.data.models.Task
@@ -23,8 +25,12 @@ class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
     val currentHour = mutableIntStateOf(getCurrentHour())
     val currentMinute = mutableIntStateOf(getCurrentMinute())
 
+    //CNT
     val startDate = mutableStateOf(getNextDate(nd = 1))
     val endDate = mutableStateOf(getNextDate(nd = 2))
+
+    val notes =  mutableStateListOf<String>()
+    val isNotePanelVisible = mutableStateOf(false)
 
     private val nameMonthByNumber = mapOf(
         1 to "January",
@@ -118,7 +124,7 @@ class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
         val currentDay = getCurrentDay()
         return year == currentYear && month == currentMonth && day == currentDay
     }
-    fun getNextDate(
+    private fun getNextDate(
         d: Int = currentDay.intValue,
         m: Int = currentMonth.intValue,
         y: Int = currentYear.intValue,

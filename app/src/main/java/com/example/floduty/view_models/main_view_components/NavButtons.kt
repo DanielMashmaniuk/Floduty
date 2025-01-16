@@ -21,7 +21,7 @@ import com.example.floduty.ui.theme.Palette
 fun NavButtons(palette: Palette, isCalendarVisible: MutableState<Boolean>) {
     Box(
         modifier = Modifier
-            .size(80.dp)
+            .size(60.dp)
             .clip(RoundedCornerShape(bottomEnd = 50.dp))
             .background(palette.primaryColor),
         contentAlignment = Alignment.Center
@@ -35,7 +35,7 @@ fun NavButtons(palette: Palette, isCalendarVisible: MutableState<Boolean>) {
                 contentDescription = "Next Month",
                 tint = palette.mainBG,
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(36.dp)
                     .padding(0.dp, 0.dp, 10.dp, 10.dp)
             )
         }
