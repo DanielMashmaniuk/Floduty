@@ -1,32 +1,19 @@
 package com.example.floduty.view_models.main_view_components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.floduty.data.MainViewModel
+import com.example.floduty.data.MainViewData
 import com.example.floduty.ui.theme.Palette
 import com.example.floduty.view_models.main_view_components.main_content_components.DayInfo
 import com.example.floduty.view_models.main_view_components.main_content_components.ScheduleNav
@@ -34,8 +21,8 @@ import com.example.floduty.view_models.main_view_components.main_content_compone
 import com.example.floduty.view_models.main_view_components.main_content_components.nav_functions.CreateNewTaskBox
 
 @Composable
-fun MainContent(currentYear: Int, currentMonth : Int,currentDay: Int,palette: Palette,mainViewModel: MainViewModel) {
-    val isCreateActivityWindowVisible = remember { mutableStateOf(false) }
+fun MainContent(currentYear: Int, currentMonth : Int, currentDay: Int, palette: Palette, mainViewData: MainViewData) {
+
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -53,7 +40,7 @@ fun MainContent(currentYear: Int, currentMonth : Int,currentDay: Int,palette: Pa
                 currentMonth = currentMonth,
                 currentDay = currentDay,
                 palette = palette,
-                mainViewModel = mainViewModel
+                mainViewData = mainViewData
             )
         }
         Box(
@@ -67,8 +54,7 @@ fun MainContent(currentYear: Int, currentMonth : Int,currentDay: Int,palette: Pa
                 currentMonth = currentMonth,
                 currentDay = currentDay,
                 palette = palette,
-                mainViewModel = mainViewModel,
-                isCreateActivityWindowVisible
+                mainViewData = mainViewData,
             )
         }
         Box(
@@ -79,12 +65,12 @@ fun MainContent(currentYear: Int, currentMonth : Int,currentDay: Int,palette: Pa
         ) {
             ScheduleTable(
                 palette = palette,
-                mainViewModel
+                mainViewData
             ){ hour, minute ->
                 println("Selected time: $hour:$minute")
             }
         }
     }
-    CreateNewTaskBox(palette,mainViewModel,isCreateActivityWindowVisible)
+    CreateNewTaskBox(palette,mainViewData)
 
 }

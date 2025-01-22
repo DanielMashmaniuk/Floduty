@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -20,11 +19,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.floduty.data.MainViewModel
+import com.example.floduty.data.MainViewData
 import com.example.floduty.ui.theme.Palette
 
 @Composable
-fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, palette: Palette, mainViewModel: MainViewModel) {
+fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, palette: Palette, mainViewData: MainViewData) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -67,7 +66,7 @@ fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, palette: Pale
             }
         }
         Text(
-            text = "${mainViewModel.getMonthsNameByNumber(currentMonth)},$currentYear",
+            text = "${mainViewData.getMonthsNameByNumber(currentMonth)},$currentYear",
             color = palette.whiteColor,
             style = TextStyle(
                 fontSize = 16.sp,
@@ -80,11 +79,11 @@ fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, palette: Pale
             modifier = Modifier
                 .width(300.dp)
         ){
-            TasksCountsBox(1, 1, mainViewModel,palette )
-            TasksCountsBox(2, 2, mainViewModel,palette )
-            TasksCountsBox(3, 3, mainViewModel, palette )
-            TasksCountsBox(4, 4, mainViewModel, palette )
-            TasksCountsBox(5, 5, mainViewModel, palette )
+            TasksCountsBox(1, 1, mainViewData,palette )
+            TasksCountsBox(2, 2, mainViewData,palette )
+            TasksCountsBox(3, 3, mainViewData, palette )
+            TasksCountsBox(4, 4, mainViewData, palette )
+            TasksCountsBox(5, 5, mainViewData, palette )
 
         }
         Column(
@@ -93,15 +92,15 @@ fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, palette: Pale
             modifier = Modifier
                 .width(300.dp)
         ) {
-            InfoBox("Busyness   ",1,palette,mainViewModel)
-            InfoBox("Intensity     ",3,palette,mainViewModel)
-            InfoBox("Importance",5,palette,mainViewModel)
+            InfoBox("Busyness   ",1,palette,mainViewData)
+            InfoBox("Intensity     ",3,palette,mainViewData)
+            InfoBox("Importance",5,palette,mainViewData)
         }
     }
 }
 
 @Composable
-fun InfoBox(description: String,level : Int,palette: Palette,mainViewModel: MainViewModel){
+fun InfoBox(description: String, level : Int, palette: Palette, mainViewData: MainViewData){
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -125,21 +124,21 @@ fun InfoBox(description: String,level : Int,palette: Palette,mainViewModel: Main
                 fontWeight = FontWeight.Bold
             )
         )
-        LevelBox(level,palette,mainViewModel)
+        LevelBox(level,palette,mainViewData)
     }
 }
 @Composable
-fun LevelBox(level: Int,palette: Palette,mainViewModel: MainViewModel){
+fun LevelBox(level: Int, palette: Palette, mainViewData: MainViewData){
     Box(
         modifier = Modifier
             .height(30.dp)
             .width(100.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(mainViewModel.getLevelColor(level)),
+            .background(mainViewData.getLevelColor(level)),
         contentAlignment = Alignment.Center
     ){
         Text(
-            text = mainViewModel.getLevelName(level),
+            text = mainViewData.getLevelName(level),
             color = palette.mainBG,
             style = TextStyle(
                 fontSize = 14.sp,
@@ -149,13 +148,13 @@ fun LevelBox(level: Int,palette: Palette,mainViewModel: MainViewModel){
     }
 }
 @Composable
-fun TasksCountsBox(tasks: Int,level: Int,mainViewModel: MainViewModel,palette: Palette){
+fun TasksCountsBox(tasks: Int, level: Int, mainViewData: MainViewData, palette: Palette){
     Box(
         modifier = Modifier
             .height(30.dp)
             .width(50.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(mainViewModel.getLevelColor(level)),
+            .background(mainViewData.getLevelColor(level)),
         contentAlignment = Alignment.Center
     ){
         Text(

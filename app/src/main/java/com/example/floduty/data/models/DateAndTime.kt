@@ -1,8 +1,6 @@
 package com.example.floduty.data.models
 
-import com.example.floduty.data.MainViewModel
-import java.time.Year
-import java.util.Date
+import com.example.floduty.data.MainViewData
 
 data class DateAndTime(
     var year : Int,
@@ -22,8 +20,8 @@ data class DateAndTime(
         return DateAndTime(newYear, newMonth, newDay, newHour, newMinutes)
     }
 
-    fun getDateTxtFormat(mainViewModel: MainViewModel): String{
-        return "${convertToFormatWithZero(day)} ${mainViewModel.getMonthsNameByNumber(month)} $year"
+    fun getDateTxtFormat(mainViewData: MainViewData): String{
+        return "${convertToFormatWithZero(day)} ${mainViewData.getMonthsNameByNumber(month)} $year"
     }
     fun getPatternFormat(): String{
         println("$year $month $day $hour $minutes")

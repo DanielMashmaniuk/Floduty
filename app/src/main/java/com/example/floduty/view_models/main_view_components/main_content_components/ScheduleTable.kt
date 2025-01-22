@@ -25,13 +25,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.floduty.data.models.Task
-import com.example.floduty.data.MainViewModel
+import com.example.floduty.data.MainViewData
 import com.example.floduty.ui.theme.Palette
 
 @Composable
 fun ScheduleTable(
     palette: Palette,
-    mainViewModel: MainViewModel,
+    mainViewData: MainViewData,
     onTimeSelected: (hour: Int, minute: Int) -> Unit
 ) {
     val hours = (0..23).map { it.toString().padStart(2, '0') }
@@ -48,7 +48,7 @@ fun ScheduleTable(
         ) {
             Spacer(modifier = Modifier.height(15.dp)) // Для годин зліва
             hours.forEach { hour ->
-                if (hour.toInt() == mainViewModel.currentHour.intValue) {
+                if (hour.toInt() == mainViewData.currentHour.intValue) {
                     Text(
                         text = hour,
                         color = palette.orangeColor,
@@ -77,7 +77,7 @@ fun ScheduleTable(
             ) {
                 minutes.forEach { minute ->
                     val mText = if (minute < 10) "0${minute}" else minute.toString()
-                    if(checkActiveTime(mainViewModel) == minute){
+                    if(checkActiveTime(mainViewData) == minute){
                         Text(
                             modifier = Modifier.width(20.dp),
                             text = mText,
@@ -100,7 +100,7 @@ fun ScheduleTable(
             ) {
                 hours.forEach { hour ->
                     Row {
-                        SetTimeBoxes(hour.toInt(),mainViewModel)
+                        SetTimeBoxes(hour.toInt(),mainViewData)
                     }
                 }
             }
@@ -108,13 +108,13 @@ fun ScheduleTable(
     }
 }
 @Composable
-fun SetTimeBoxes(hour: Int,mainViewModel: MainViewModel){
+fun SetTimeBoxes(hour: Int, mainViewData: MainViewData){
     var min = 0
     while (min < 60){
         val time = hour * 60 + min
-        val res = checkTaskAtTime(time,mainViewModel.tasks)
+        val res = checkTaskAtTime(time,mainViewData.tasks)
         if (res.first){
-            TaskBox(res.second!!,mainViewModel)
+            TaskBox(res.second!!,mainViewData)
         }else{
             Spacer(modifier = Modifier.width(8.dp).height(15.dp))
 //            Box(
@@ -133,14 +133,14 @@ fun SetTimeBoxes(hour: Int,mainViewModel: MainViewModel){
     }
 }
 @Composable
-fun TaskBox(task: Task, mainViewModel: MainViewModel){
+fun TaskBox(task: Task, mainViewData: MainViewData){
     val duration = task.durationMinutes * 8
     Box(
         modifier = Modifier
             .width(duration.dp)
             .height(15.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(mainViewModel.getLevelColor(task.weight)),
+            .background(mainViewData.getLevelColor(task.weight)),
         contentAlignment = Alignment.Center
     ){
         Text(
@@ -158,8 +158,8 @@ fun checkTaskAtTime(time: Int,tasks: List<Task>) : Pair<Boolean,Task?>{
     }
     return Pair(false,null)
 }
-fun checkActiveTime(mainViewModel: MainViewModel): Int{
-    var min = mainViewModel.currentMinute.intValue
+fun checkActiveTime(mainViewData: MainViewData): Int{
+    var min = mainViewData.currentMinute.intValue
     println(min)
     while (min % 5 != 0){
         min += 1

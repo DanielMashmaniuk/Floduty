@@ -1,6 +1,5 @@
 package com.example.floduty.view_models.main_view_components
 
-import android.icu.util.IslamicCalendar
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -23,8 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,21 +33,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.floduty.R
-import com.example.floduty.data.MainViewModel
+import com.example.floduty.data.MainViewData
 import com.example.floduty.ui.theme.Palette
 import java.time.LocalDate
 import java.time.YearMonth
 
 @Composable
-fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int,currentDay: Int,palette: Palette,isCalendarVisible: MutableState<Boolean>){
+fun MiniCalendar(mainViewData: MainViewData, currentYear: Int, currentMonth: Int, currentDay: Int, palette: Palette){
 
     AnimatedVisibility(
-        visible = isCalendarVisible.value,
+        visible = mainViewData.isCalendarVisible.value,
         enter = fadeIn() + expandVertically(),  // Ефект появи
         exit = fadeOut() + shrinkVertically()   // Ефект зникнення
     ) {
-        val monthCalendar = remember { mutableStateOf(currentMonth) }
-        val yearCalendar = remember { mutableStateOf(currentYear) }
+        val monthCalendar = remember { mutableIntStateOf(currentMonth) }
+        val yearCalendar = remember { mutableIntStateOf(currentYear) }
 
         Box(
             modifier = Modifier
@@ -59,7 +57,7 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
                 .background(palette.secondBG)
         ) {
 
-            CustomCalendar(yearCalendar.value, monthCalendar.value, currentDay, palette, mainViewModel)
+            CustomCalendar(yearCalendar.intValue, monthCalendar.intValue, currentDay, palette, mainViewData)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -91,9 +89,9 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
                         // Previous Button
                         IconButton(
                             onClick = {
-                                val dateCalendar = setPreviousMonthCalendar(monthCalendar.value,yearCalendar.value)
-                                monthCalendar.value = dateCalendar.second
-                                yearCalendar.value = dateCalendar.first
+                                val dateCalendar = setPreviousMonthCalendar(monthCalendar.intValue,yearCalendar.intValue)
+                                monthCalendar.intValue = dateCalendar.second
+                                yearCalendar.intValue = dateCalendar.first
                             },
                             modifier = Modifier.size(40.dp)
                         ) {
@@ -107,7 +105,7 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
 
                         // Month and Year Text
                         Text(
-                            text = "${mainViewModel.getMonthsNameByNumber(monthCalendar.value)}, ${yearCalendar.value}",
+                            text = "${mainViewData.getMonthsNameByNumber(monthCalendar.intValue)}, ${yearCalendar.intValue}",
                             color = palette.primaryColor,
                             style = TextStyle(
                                 fontSize = 16.sp,
@@ -118,9 +116,9 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
                         // Next Button
                         IconButton(
                             onClick = {
-                                val dateCalendar = setNextMonthCalendar(monthCalendar.value,yearCalendar.value)
-                                monthCalendar.value = dateCalendar.second
-                                yearCalendar.value = dateCalendar.first
+                                val dateCalendar = setNextMonthCalendar(monthCalendar.intValue,yearCalendar.intValue)
+                                monthCalendar.intValue = dateCalendar.second
+                                yearCalendar.intValue = dateCalendar.first
                             },
                             modifier = Modifier.size(40.dp)
                         ) {
@@ -133,7 +131,7 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
                         }
                     }
                     IconButton(
-                        onClick = { mainViewModel.setPreviousMonth() },
+                        onClick = { mainViewData.setPreviousMonth() },
                         modifier = Modifier.size(40.dp)
                     ) {
                         Icon(
@@ -149,7 +147,7 @@ fun MiniCalendar(mainViewModel: MainViewModel,currentYear: Int,currentMonth: Int
     }
 }
 @Composable
-fun CustomCalendar(year: Int,month: Int,currentDay: Int, palette: Palette, mainViewModel: MainViewModel) {
+fun CustomCalendar(year: Int, month: Int, currentDay: Int, palette: Palette, mainViewData: MainViewData) {
     val calendarData = generateCalendarData(year,month)
 
     Column(
@@ -177,8 +175,8 @@ fun CustomCalendar(year: Int,month: Int,currentDay: Int, palette: Palette, mainV
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 week.forEach { day ->
-                    if (mainViewModel.isCurrentDay(year,day!!.monthValue, day.dayOfMonth)) {
-                        CurrentDayBox(day?.dayOfMonth, palette) // Для поточного місяця
+                    if (mainViewData.isCurrentDay(year,day!!.monthValue, day.dayOfMonth)) {
+                        CurrentDayBox(day.dayOfMonth, palette) // Для поточного місяця
                     } else if (day != null) {
                         if (day.monthValue != month) {
                             InactiveDayBox(

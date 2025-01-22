@@ -3,7 +3,6 @@ package com.example.floduty.data
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.example.floduty.data.models.Task
@@ -17,7 +16,7 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
+class MainViewData(private val taskDao: TaskDao) : ViewModel() {
     val palette = Palette()
     var currentMonth = mutableIntStateOf(getCurrentMonth())
     var currentYear = mutableIntStateOf(getCurrentYear())
@@ -25,12 +24,11 @@ class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
     val currentHour = mutableIntStateOf(getCurrentHour())
     val currentMinute = mutableIntStateOf(getCurrentMinute())
 
-    //CNT
-    val startDate = mutableStateOf(getNextDate(nd = 1))
-    val endDate = mutableStateOf(getNextDate(nd = 2))
 
-    val notes =  mutableStateListOf<String>()
-    val isNotePanelVisible = mutableStateOf(false)
+
+    //VISIBILITIES
+    val isCreateActivityWindowVisible = mutableStateOf(false)
+    val isCalendarVisible = mutableStateOf(false)
 
     private val nameMonthByNumber = mapOf(
         1 to "January",
@@ -72,7 +70,7 @@ class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
             weight = 4,
             startDate = "2025/1/6",
             endDate = "2024/1/8",
-            isCompleted = false,
+            completeStatus = "Not",
         )
     )
     fun getLevelName(level: Int): String =
@@ -124,7 +122,7 @@ class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
         val currentDay = getCurrentDay()
         return year == currentYear && month == currentMonth && day == currentDay
     }
-    private fun getNextDate(
+    fun getNextDate(
         d: Int = currentDay.intValue,
         m: Int = currentMonth.intValue,
         y: Int = currentYear.intValue,
@@ -222,7 +220,6 @@ class MainViewModel(private val taskDao: TaskDao) : ViewModel() {
     fun getDaysInMonth(year: Int, month: Int): Int {
         return YearMonth.of(year, month).lengthOfMonth()
     }
-
 
 }
 
