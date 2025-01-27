@@ -21,15 +21,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.floduty.R
-import com.example.floduty.data.MainViewData
+import com.example.floduty.screens.MainViewData
 import com.example.floduty.ui.theme.Palette
+import com.example.floduty.ui.theme.palette
 
 @Composable
 fun ScheduleNav(
     currentYear: Int,
     currentMonth : Int,
     currentDay: Int,
-    palette: Palette,
     mainViewData: MainViewData,
 ) {
     Column(
@@ -92,7 +92,7 @@ fun ScheduleNav(
                     )
                 }
                 IconButton(
-                    onClick = {  },
+                    onClick = { mainViewData.showQuickMessage("Everything is working") },
                     modifier = Modifier.size(28.dp)
                 ) {
                     Icon(
@@ -104,7 +104,7 @@ fun ScheduleNav(
                     )
                 }
                 IconButton(
-                    onClick = {  },
+                    onClick = {  mainViewData.fetchAllTask() },
                     modifier = Modifier.size(28.dp)
                 ) {
                     Icon(

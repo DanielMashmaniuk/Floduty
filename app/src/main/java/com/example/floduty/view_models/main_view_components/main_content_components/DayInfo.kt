@@ -19,11 +19,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.floduty.data.MainViewData
+import com.example.floduty.screens.MainViewData
 import com.example.floduty.ui.theme.Palette
+import com.example.floduty.ui.theme.palette
 
 @Composable
-fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, palette: Palette, mainViewData: MainViewData) {
+fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, mainViewData: MainViewData) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

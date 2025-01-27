@@ -1,14 +1,19 @@
-package com.example.floduty.data
+package com.example.floduty.screens
 
+import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.floduty.data.models.Task
 import com.example.floduty.data.db.TaskDao
 import com.example.floduty.data.models.DateAndTime
 import com.example.floduty.ui.theme.Palette
+import com.example.floduty.ui.theme.palette
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -17,7 +22,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 class MainViewData(private val taskDao: TaskDao) : ViewModel() {
-    val palette = Palette()
     var currentMonth = mutableIntStateOf(getCurrentMonth())
     var currentYear = mutableIntStateOf(getCurrentYear())
     var currentDay = mutableIntStateOf(getCurrentDay())
@@ -29,6 +33,10 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
     //VISIBILITIES
     val isCreateActivityWindowVisible = mutableStateOf(false)
     val isCalendarVisible = mutableStateOf(false)
+    val isWaitingScreenVisible = mutableStateOf(false)
+    val isQuickMessageScreenVisible = mutableStateOf(false)
+
+    val quickMessageState= mutableStateOf(QMInfo())
 
     private val nameMonthByNumber = mapOf(
         1 to "January",
@@ -51,7 +59,7 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
         4 to "Hard",
         5 to "Extreme"
     )
-    private val colorLevelByNumber = mapOf(
+    private val colorLevelByNumber :  Map<Int, Color> = mapOf(
         1 to palette.simpleLevelColor,
         2 to palette.easyColor,
         3 to palette.mediumColor,
@@ -220,7 +228,43 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
     fun getDaysInMonth(year: Int, month: Int): Int {
         return YearMonth.of(year, month).lengthOfMonth()
     }
-
+    suspend fun addNewTaskToDB(task: Task) {
+        try {
+            taskDao.insertTask(task)
+        } catch (e: Exception) {
+            Log.e("inserting T Error",e.message.toString())
+            throw e
+        } finally {
+            isWaitingScreenVisible.value = false
+        }
+    }
+    fun fetchAllTask() {
+        viewModelScope.launch {
+            try {
+                val tasksList = taskDao.getAllTasks()
+                tasksList.forEach {
+                    println("${it.name} -- ${it.notes}")
+                }
+            } catch (e: Exception) {
+                Log.e("getting T Error", e.message.toString())
+                throw e
+            } finally {
+                isWaitingScreenVisible.value = false
+            }
+        }
+    }
+    fun showQuickMessage(
+        message:String = quickMessageState.value.message,
+        background: Color = quickMessageState.value.colorBG,
+        time: Long = 2000
+        ){
+        quickMessageState.value = QMInfo(message,background)
+        isQuickMessageScreenVisible.value = true
+        viewModelScope.launch {
+            delay(time)
+            isQuickMessageScreenVisible.value = false
+        }
+    }
 }
 
 fun getCurrentMonth(): Int {
@@ -243,4 +287,11 @@ fun getCurrentMinute(): Int {
 fun getCurrentHour(): Int {
     val currentTime = LocalTime.now() // Отримуємо поточний час
     return currentTime.hour // Повертаємо хвилину
+}
+class QMInfo(
+    val message : String = "Something Wrong",
+    val colorBG : Color = palette.hardColor,
+    val textColor : Color = palette.mainBG
+){
+
 }

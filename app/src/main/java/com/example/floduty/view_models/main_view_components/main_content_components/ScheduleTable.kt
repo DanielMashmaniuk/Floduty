@@ -25,12 +25,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.floduty.data.models.Task
-import com.example.floduty.data.MainViewData
+import com.example.floduty.screens.MainViewData
 import com.example.floduty.ui.theme.Palette
+import com.example.floduty.ui.theme.palette
 
 @Composable
 fun ScheduleTable(
-    palette: Palette,
     mainViewData: MainViewData,
     onTimeSelected: (hour: Int, minute: Int) -> Unit
 ) {

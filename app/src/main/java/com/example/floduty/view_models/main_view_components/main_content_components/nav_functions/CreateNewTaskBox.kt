@@ -37,7 +37,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,7 +49,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -61,19 +59,20 @@ import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.floduty.R
-import com.example.floduty.data.CNAScreenData
-import com.example.floduty.data.MainViewData
+import com.example.floduty.screens.CNAScreenData
+import com.example.floduty.screens.MainViewData
 import com.example.floduty.data.models.DateAndTime
 import com.example.floduty.data.models.Task
 import com.example.floduty.ui.theme.Palette
+import com.example.floduty.ui.theme.palette
 import com.example.floduty.view_models.main_view_components.main_content_components.LevelBox
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun CreateNewTaskBox(palette: Palette, mainViewData: MainViewData) {
+fun CreateNewTaskBox(mainViewData: MainViewData) {
     val isClickedAName = remember { mutableStateOf(false) }
-    val screenData = CNAScreenData(mainViewData,palette)
+    val screenData = CNAScreenData(mainViewData)
 
 
     AnimatedVisibility(
@@ -265,6 +264,9 @@ fun CreateNewTaskBox(palette: Palette, mainViewData: MainViewData) {
                                 if (screenData.textDifference.value == "Invalid Time"){
                                     return@clickable
                                 }
+
+                                mainViewData.isWaitingScreenVisible.value= true
+
                                 Task.createTask(
                                     screenData.titleActivity.value,
                                     screenData.descriptionActivity.value,
@@ -278,7 +280,9 @@ fun CreateNewTaskBox(palette: Palette, mainViewData: MainViewData) {
                                     screenData.currentLevel.intValue,
                                     screenData.checkIsComplete()
                                 ){
-
+                                    coroutineScope.launch {
+                                        mainViewData.addNewTaskToDB(it)
+                                    }
                                 }
                             },
                         contentAlignment = Alignment.Center
@@ -351,11 +355,11 @@ fun ActivityInfo(
                     width = 2.dp,
                     color = screenData.color.value,
                     shape = RoundedCornerShape(10.dp))
-                .background(if (isFocusedTitle.value) screenData.palette.dark else screenData.color.value),
+                .background(if (isFocusedTitle.value) palette.dark else screenData.color.value),
 
             textStyle = TextStyle(
                 fontSize = 14.sp,
-                color = if (isFocusedTitle.value) screenData.color.value else screenData.palette.mainBG,
+                color = if (isFocusedTitle.value) screenData.color.value else palette.mainBG,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center
             ),
@@ -369,7 +373,7 @@ fun ActivityInfo(
                     if (screenData.titleActivity.value.isEmpty()) {
                         Text(
                             text = "Type title...",
-                            color = if (isFocusedTitle.value) screenData.color.value else screenData.palette.mainBG,
+                            color = if (isFocusedTitle.value) screenData.color.value else palette.mainBG,
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
@@ -407,9 +411,9 @@ fun ActivityInfo(
                 },
             contentAlignment = Alignment.Center
         ) {
-            LevelBox(screenData.currentLevel.intValue,screenData.palette,mainViewData)
+            LevelBox(screenData.currentLevel.intValue,palette,mainViewData)
         }
-        TitleInfo("Description",screenData.palette)
+        TitleInfo("Description")
         BasicTextField(
             value = screenData.descriptionActivity.value,
             onValueChange = { newText ->
@@ -433,9 +437,9 @@ fun ActivityInfo(
                     width = 2.dp,
                     color = screenData.color.value,
                     shape = RoundedCornerShape(10.dp))
-                .background(if (isFocusedDscp.value) screenData.palette.dark else screenData.color.value),
+                .background(if (isFocusedDscp.value) palette.dark else screenData.color.value),
             textStyle = TextStyle(
-                color = if (isFocusedDscp.value) screenData.color.value else screenData.palette.mainBG,
+                color = if (isFocusedDscp.value) screenData.color.value else palette.mainBG,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             ),
@@ -449,7 +453,7 @@ fun ActivityInfo(
                     if (screenData.descriptionActivity.value.isEmpty()) {
                         Text(
                             text = "Type description...",
-                            color = if (isFocusedDscp.value) screenData.color.value else screenData.palette.mainBG,
+                            color = if (isFocusedDscp.value) screenData.color.value else palette.mainBG,
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
@@ -467,7 +471,7 @@ fun ActivityInfo(
             }
         )
 
-        TitleInfo("Duration",screenData.palette)
+        TitleInfo("Duration")
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -482,7 +486,7 @@ fun ActivityInfo(
             ){
                 Text(
                     text = "FROM",
-                    color = screenData.palette.mainBG,
+                    color = palette.mainBG,
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -525,7 +529,7 @@ fun ActivityInfo(
                     Icon(
                         painter = painterResource(id = R.drawable.switch_icon),
                         contentDescription = "switch date",
-                        tint = screenData.palette.mainBG,
+                        tint = palette.mainBG,
                         modifier = Modifier
                             .size(16.dp)
                     )
@@ -555,7 +559,7 @@ fun ActivityInfo(
             ){
                 Text(
                     text = "TO",
-                    color = screenData.palette.mainBG,
+                    color = palette.mainBG,
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -597,7 +601,7 @@ fun ActivityInfo(
                     Icon(
                         painter = painterResource(id = R.drawable.switch_icon),
                         contentDescription = "switch date",
-                        tint = screenData.palette.mainBG,
+                        tint = palette.mainBG,
                         modifier = Modifier
                             .size(16.dp)
                     )
@@ -627,20 +631,20 @@ fun ActivityInfo(
 
             Text(
                 text = screenData.textDifference.value,
-                color = screenData.palette.mainBG,
+                color = palette.mainBG,
                 style = TextStyle(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
             )
         }
-        TitleInfo("Notes",screenData.palette)
+        TitleInfo("Notes")
         Box(Modifier
             .fillMaxWidth()
             .height(150.dp)
             .padding(horizontal = 10.dp)
             .clip(RoundedCornerShape(25.dp))
-            .background(screenData.palette.lightGaryBG),
+            .background(palette.lightGaryBG),
         ) {
             NotesList(screenData)
         }
@@ -667,7 +671,7 @@ fun NotesList(screenData: CNAScreenData) {
                     enter = slideInHorizontally(initialOffsetX = { 300 }) + fadeIn(),
                     exit = slideOutHorizontally(targetOffsetX = { -300 }) + fadeOut()
                 ) {
-                    NoteBox(screenData.palette, note) {
+                    NoteBox(note) {
                         isVisible.value = false
                     }
 
@@ -697,7 +701,7 @@ fun NotesList(screenData: CNAScreenData) {
             Icon(
                 painter = painterResource(id = R.drawable.add_svgrepo_com),
                 contentDescription = "add note",
-                tint = screenData.palette.orangeColor,
+                tint = palette.orangeColor,
                 modifier = Modifier.size(14.dp)
             )
         }
@@ -720,7 +724,7 @@ fun WriteNotePanel(screenData: CNAScreenData){
             .height(50.dp)
             .padding(horizontal = 10.dp)
             .clip(RoundedCornerShape(15.dp))
-            .background(screenData.palette.lightGaryBG),
+            .background(palette.lightGaryBG),
             contentAlignment = Alignment.Center
         ) {
             Row (
@@ -740,11 +744,11 @@ fun WriteNotePanel(screenData: CNAScreenData){
                         .height(40.dp)
                         .width(textWidth.coerceAtLeast(150.dp).coerceAtMost(300.dp))
                         .clip(RoundedCornerShape(10.dp))
-                        .background(screenData.palette.lightGaryBG),
+                        .background(palette.lightGaryBG),
 
                     textStyle = TextStyle(
                         fontSize = 16.sp,
-                        color = screenData.palette.orangeColor,
+                        color = palette.orangeColor,
                         fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Center
                     ),
@@ -758,7 +762,7 @@ fun WriteNotePanel(screenData: CNAScreenData){
                             if (noteText.value.isEmpty()) {
                                 Text(
                                     text = "Type note...",
-                                    color = screenData.palette.orangeLightColor,
+                                    color = palette.orangeLightColor,
                                     style = TextStyle(
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Medium
@@ -781,12 +785,12 @@ fun WriteNotePanel(screenData: CNAScreenData){
                         .size(20.dp)
                         .clip(RoundedCornerShape(50.dp))
                         .padding(0.dp)
-                        .background(screenData.palette.orangeColor)
+                        .background(palette.orangeColor)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.add_svgrepo_com ),
                         contentDescription = "add note",
-                        tint = screenData.palette.lightGaryBG,
+                        tint = palette.lightGaryBG,
                         modifier = Modifier
                             .size(16.dp)
                     )
@@ -796,7 +800,7 @@ fun WriteNotePanel(screenData: CNAScreenData){
     }
 }
 @Composable
-fun NoteBox(palette: Palette, note: String, onDeletedNote: (String) -> Unit) {
+fun NoteBox(note: String, onDeletedNote: (String) -> Unit) {
     val isVisible = remember { mutableStateOf(true) }
 
     AnimatedVisibility(
@@ -877,7 +881,7 @@ fun TimeSwitcher(
                 .padding(horizontal = 10.dp)
                 .shadow(8.dp, shape = RoundedCornerShape(20.dp))
                 .clip(RoundedCornerShape(20.dp))
-                .background(screenData.palette.lightGaryBG)
+                .background(palette.lightGaryBG)
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -890,12 +894,11 @@ fun TimeSwitcher(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ChoosedSection(2100, year, screenData.palette, mainViewData)
-                    ChoosedSection(13, month, screenData.palette, mainViewData, true, false)
+                    ChoosedSection(2100, year, mainViewData)
+                    ChoosedSection(13, month, mainViewData, true, false)
                     ChoosedSection(
                         mainViewData.getDaysInMonth(year.intValue, month.intValue) + 1,
                         day,
-                        screenData.palette,
                         mainViewData,
                         containZero = false
                     )
@@ -903,16 +906,16 @@ fun TimeSwitcher(
                         horizontalArrangement = Arrangement.spacedBy(2.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        ChoosedSection(24, hours, screenData.palette, mainViewData)
+                        ChoosedSection(24, hours, mainViewData)
                         Text(
                             text = ":",
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = screenData.palette.whiteColor
+                                color = palette.whiteColor
                             )
                         )
-                        ChoosedSection(60, minutes, screenData.palette, mainViewData)
+                        ChoosedSection(60, minutes, mainViewData)
                     }
                 }
                 Box(Modifier.fillMaxWidth().padding(5.dp).height(30.dp), contentAlignment = Alignment.Center) {
@@ -926,7 +929,7 @@ fun TimeSwitcher(
                             Icon(
                                 painter = painterResource(id = R.drawable.close_square),
                                 contentDescription = "Increase hours",
-                                tint = screenData.palette.hardColor,
+                                tint = palette.hardColor,
                                 modifier = Modifier
                                     .size(24.dp)
                             )
@@ -946,7 +949,7 @@ fun TimeSwitcher(
                             Icon(
                                 painter = painterResource(id = R.drawable.done_ring_round),
                                 contentDescription = "Increase hours",
-                                tint = screenData.palette.primaryColor,
+                                tint = palette.primaryColor,
                                 modifier = Modifier
                                     .size(24.dp)
                             )
@@ -958,7 +961,7 @@ fun TimeSwitcher(
     }
 }
 @Composable
-fun ChoosedSection(endIdx: Int, value : MutableState<Int>, palette: Palette, mainViewData: MainViewData, isMonth : Boolean = false, containZero: Boolean = true){
+fun ChoosedSection(endIdx: Int, value : MutableState<Int>,mainViewData: MainViewData, isMonth : Boolean = false, containZero: Boolean = true){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -1008,7 +1011,7 @@ fun ChoosedSection(endIdx: Int, value : MutableState<Int>, palette: Palette, mai
     }
 }
 @Composable
-fun TitleInfo(text: String,palette: Palette){
+fun TitleInfo(text: String){
     Box(
         Modifier
             .height(30.dp)

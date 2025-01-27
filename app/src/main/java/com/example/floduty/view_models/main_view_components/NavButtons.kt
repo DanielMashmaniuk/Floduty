@@ -16,11 +16,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.floduty.R
-import com.example.floduty.data.MainViewData
+import com.example.floduty.screens.MainViewData
 import com.example.floduty.ui.theme.Palette
+import com.example.floduty.ui.theme.palette
 
 @Composable
-fun NavButtons(palette: Palette, mainViewData: MainViewData) {
+fun NavButtons( mainViewData: MainViewData) {
     Box(
         modifier = Modifier
             .size(60.dp)

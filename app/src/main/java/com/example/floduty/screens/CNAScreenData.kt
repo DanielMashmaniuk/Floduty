@@ -1,15 +1,14 @@
-package com.example.floduty.data
+package com.example.floduty.screens
 
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.example.floduty.ui.theme.Palette
+import com.example.floduty.ui.theme.palette
 
-class CNAScreenData(mViewData: MainViewData,p: Palette) {
-    val palette = p
+class CNAScreenData(mViewData: MainViewData) {
     val mainViewData = mViewData
     //CNT
     val startDate = mutableStateOf(mainViewData.getNextDate(nd = 1))
@@ -23,7 +22,7 @@ class CNAScreenData(mViewData: MainViewData,p: Palette) {
             mainViewData.calculateTimeDifference(startDate.value, endDate.value)
         }
 
-    val color = derivedStateOf {
+    val color = derivedStateOf<Color> {
         if (nameActivity.value == "Task") {
             palette.primaryColor
         } else {

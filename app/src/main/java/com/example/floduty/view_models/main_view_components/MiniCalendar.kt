@@ -33,13 +33,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.floduty.R
-import com.example.floduty.data.MainViewData
+import com.example.floduty.screens.MainViewData
 import com.example.floduty.ui.theme.Palette
+import com.example.floduty.ui.theme.palette
 import java.time.LocalDate
 import java.time.YearMonth
 
 @Composable
-fun MiniCalendar(mainViewData: MainViewData, currentYear: Int, currentMonth: Int, currentDay: Int, palette: Palette){
+fun MiniCalendar(mainViewData: MainViewData, currentYear: Int, currentMonth: Int, currentDay: Int){
 
     AnimatedVisibility(
         visible = mainViewData.isCalendarVisible.value,
@@ -57,7 +58,7 @@ fun MiniCalendar(mainViewData: MainViewData, currentYear: Int, currentMonth: Int
                 .background(palette.secondBG)
         ) {
 
-            CustomCalendar(yearCalendar.intValue, monthCalendar.intValue, currentDay, palette, mainViewData)
+            CustomCalendar(yearCalendar.intValue, monthCalendar.intValue, currentDay, mainViewData)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -147,7 +148,7 @@ fun MiniCalendar(mainViewData: MainViewData, currentYear: Int, currentMonth: Int
     }
 }
 @Composable
-fun CustomCalendar(year: Int, month: Int, currentDay: Int, palette: Palette, mainViewData: MainViewData) {
+fun CustomCalendar(year: Int, month: Int, currentDay: Int, mainViewData: MainViewData) {
     val calendarData = generateCalendarData(year,month)
 
     Column(
@@ -162,7 +163,7 @@ fun CustomCalendar(year: Int, month: Int, currentDay: Int, palette: Palette, mai
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun").forEach { day ->
-                WeekBox(day,palette)
+                WeekBox(day)
             }
         }
 
@@ -176,18 +177,15 @@ fun CustomCalendar(year: Int, month: Int, currentDay: Int, palette: Palette, mai
             ) {
                 week.forEach { day ->
                     if (mainViewData.isCurrentDay(year,day!!.monthValue, day.dayOfMonth)) {
-                        CurrentDayBox(day.dayOfMonth, palette) // Для поточного місяця
+                        CurrentDayBox(day.dayOfMonth ) // Для поточного місяця
                     } else if (day != null) {
                         if (day.monthValue != month) {
-                            InactiveDayBox(
-                                day.dayOfMonth,
-                                palette
-                            ) // Для минулого або наступного місяця
+                            InactiveDayBox(day.dayOfMonth) // Для минулого або наступного місяця
                         } else {
-                            DayBox(day.dayOfMonth.toString(), palette) // Для поточного місяця
+                            DayBox(day.dayOfMonth.toString()) // Для поточного місяця
                         }
                     } else {
-                        InactiveDayBox(-1, palette) // Для порожніх клітинок
+                        InactiveDayBox(-1) // Для порожніх клітинок
                     }
                 }
             }

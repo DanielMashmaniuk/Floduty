@@ -11,7 +11,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-val palette = Palette()
+val palette = Palette
 private val DarkColorScheme = darkColorScheme(
     primary = palette.primaryColor,
     secondary = palette.mainBG,

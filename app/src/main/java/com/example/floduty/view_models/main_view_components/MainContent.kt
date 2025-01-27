@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.floduty.data.MainViewData
+import com.example.floduty.screens.MainViewData
 import com.example.floduty.ui.theme.Palette
 import com.example.floduty.view_models.main_view_components.main_content_components.DayInfo
 import com.example.floduty.view_models.main_view_components.main_content_components.ScheduleNav
@@ -21,7 +21,7 @@ import com.example.floduty.view_models.main_view_components.main_content_compone
 import com.example.floduty.view_models.main_view_components.main_content_components.nav_functions.CreateNewTaskBox
 
 @Composable
-fun MainContent(currentYear: Int, currentMonth : Int, currentDay: Int, palette: Palette, mainViewData: MainViewData) {
+fun MainContent(currentYear: Int, currentMonth : Int, currentDay: Int, mainViewData: MainViewData) {
 
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -39,7 +39,6 @@ fun MainContent(currentYear: Int, currentMonth : Int, currentDay: Int, palette: 
                 currentYear = currentYear,
                 currentMonth = currentMonth,
                 currentDay = currentDay,
-                palette = palette,
                 mainViewData = mainViewData
             )
         }
@@ -53,7 +52,6 @@ fun MainContent(currentYear: Int, currentMonth : Int, currentDay: Int, palette: 
                 currentYear = currentYear,
                 currentMonth = currentMonth,
                 currentDay = currentDay,
-                palette = palette,
                 mainViewData = mainViewData,
             )
         }
@@ -64,13 +62,12 @@ fun MainContent(currentYear: Int, currentMonth : Int, currentDay: Int, palette: 
             contentAlignment = Alignment.Center
         ) {
             ScheduleTable(
-                palette = palette,
                 mainViewData
             ){ hour, minute ->
                 println("Selected time: $hour:$minute")
             }
         }
     }
-    CreateNewTaskBox(palette,mainViewData)
+    CreateNewTaskBox(mainViewData)
 
 }

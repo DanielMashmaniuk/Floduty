@@ -1,10 +1,10 @@
-package com.example.floduty.screens
+package com.example.floduty.data
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.floduty.data.MainViewData
 import com.example.floduty.data.db.DatabaseProvider
+import com.example.floduty.screens.MainViewData
 import com.example.floduty.view_models.MainView
 
 class MainScreen : ComponentActivity() {

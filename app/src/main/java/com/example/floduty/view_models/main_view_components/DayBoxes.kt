@@ -19,9 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.floduty.ui.theme.Palette
+import com.example.floduty.ui.theme.palette
 
 @Composable
-fun WeekBox(day: String,palette: Palette) {
+fun WeekBox(day: String) {
     Box(
         modifier = Modifier
             .width(30.dp)
@@ -39,7 +40,7 @@ fun WeekBox(day: String,palette: Palette) {
     }
 }
 @Composable
-fun DayBox(day: String, palette: Palette) {
+fun DayBox(day: String) {
     Box(
         modifier = Modifier
             .size(30.dp)
@@ -69,7 +70,7 @@ fun DayBox(day: String, palette: Palette) {
     }
 }
 @Composable
-fun ActiveDayBox(day: String, palette: Palette) {
+fun ActiveDayBox(day: String) {
     Box(
         modifier = Modifier
             .size(30.dp)
@@ -106,7 +107,7 @@ fun ActiveDayBox(day: String, palette: Palette) {
     }
 }
 @Composable
-fun InactiveDayBox(day: Int, palette: Palette) {
+fun InactiveDayBox(day: Int) {
     Box(
         modifier = Modifier
             .size(30.dp)
@@ -135,7 +136,7 @@ fun InactiveDayBox(day: Int, palette: Palette) {
     }
 }
 @Composable
-fun CurrentDayBox(day: Int?, palette: Palette) {
+fun CurrentDayBox(day: Int?) {
     Box(
         modifier = Modifier
             .size(30.dp)

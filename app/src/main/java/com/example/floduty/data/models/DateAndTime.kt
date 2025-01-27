@@ -1,6 +1,6 @@
 package com.example.floduty.data.models
 
-import com.example.floduty.data.MainViewData
+import com.example.floduty.screens.MainViewData
 
 data class DateAndTime(
     var year : Int,
