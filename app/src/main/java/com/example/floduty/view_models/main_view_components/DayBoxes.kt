@@ -40,7 +40,7 @@ fun WeekBox(day: String) {
     }
 }
 @Composable
-fun DayBox(day: String) {
+fun DayBox(day: Int, onClicked : (Int) -> Unit) {
     Box(
         modifier = Modifier
             .size(30.dp)
@@ -49,7 +49,7 @@ fun DayBox(day: String) {
         contentAlignment = Alignment.Center
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { onClicked(day) },
             modifier = Modifier
                 .fillMaxSize(),
             colors = ButtonDefaults.buttonColors(
@@ -58,7 +58,7 @@ fun DayBox(day: String) {
             contentPadding = PaddingValues(0.dp) // Прибираємо відступи за замовчуванням
         ) {
             Text(
-                text = day,
+                text = day.toString(),
                 color = palette.mainBG,
                 style = TextStyle(
                     fontSize = 14.sp,
@@ -136,7 +136,7 @@ fun InactiveDayBox(day: Int) {
     }
 }
 @Composable
-fun CurrentDayBox(day: Int?) {
+fun CurrentDayBox(day: Int,onClicked : (Int) -> Unit) {
     Box(
         modifier = Modifier
             .size(30.dp)
@@ -145,7 +145,7 @@ fun CurrentDayBox(day: Int?) {
         contentAlignment = Alignment.Center
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { onClicked(day) },
             modifier = Modifier
                 .fillMaxSize(),
             colors = ButtonDefaults.buttonColors(

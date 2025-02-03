@@ -27,9 +27,6 @@ import com.example.floduty.ui.theme.palette
 
 @Composable
 fun ScheduleNav(
-    currentYear: Int,
-    currentMonth : Int,
-    currentDay: Int,
     mainViewData: MainViewData,
 ) {
     Column(

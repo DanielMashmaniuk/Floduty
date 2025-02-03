@@ -1,8 +1,11 @@
 package com.example.floduty.screens
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +14,7 @@ import com.example.floduty.data.db.TaskDao
 import com.example.floduty.data.models.DateAndTime
 import com.example.floduty.ui.theme.Palette
 import com.example.floduty.ui.theme.palette
+import com.example.floduty.view_models.main_view_components.CurrentDayBox
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -27,16 +31,18 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
     var currentDay = mutableIntStateOf(getCurrentDay())
     val currentHour = mutableIntStateOf(getCurrentHour())
     val currentMinute = mutableIntStateOf(getCurrentMinute())
-
+    val tasksGroupsInHourLines = mutableStateListOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
 
 
     //VISIBILITIES
     val isCreateActivityWindowVisible = mutableStateOf(false)
     val isCalendarVisible = mutableStateOf(false)
-    val isWaitingScreenVisible = mutableStateOf(false)
+    private val isWaitingScreenVisible = mutableStateOf(false)
     val isQuickMessageScreenVisible = mutableStateOf(false)
 
     val quickMessageState= mutableStateOf(QMInfo())
+    private val messageQueue = mutableListOf<QMInfo>() // Черга повідомлень
+    private var isProcessingQueue = false // Флаг для перевірки обробки черги
 
     private val nameMonthByNumber = mapOf(
         1 to "January",
@@ -66,21 +72,8 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
         4 to palette.hardColor,
         5 to palette.extremeColor
     )
-    val tasks = listOf(
-        Task(
-            name = "Work",
-            description = "LOL",
-            startHour = 22,
-            startMinute = 0,
-            endHour = 23,
-            endMinute = 0,
-            notes = "JJ",
-            weight = 4,
-            startDate = "2025/1/6",
-            endDate = "2024/1/8",
-            completeStatus = "Not",
-        )
-    )
+    val tasks = mutableStateOf<List<Task>>(emptyList()) // Використовуємо immutable List
+
     fun getLevelName(level: Int): String =
         nameLevelByNumber[level] ?: "Unknown"
 
@@ -228,14 +221,38 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
     fun getDaysInMonth(year: Int, month: Int): Int {
         return YearMonth.of(year, month).lengthOfMonth()
     }
+    fun fetchTasks(year: Int,month: Int,day: Int){
+        viewModelScope.launch {
+            tasks.value = (getTasksOnDay(year,month,day))
+            if (tasks.value.isEmpty()){
+                showQuickMessage("No tasks here....")
+            }
+        }
+    }
+    //{--Task Area---------------------------------------------------------------------------------------------
     suspend fun addNewTaskToDB(task: Task) {
         try {
             taskDao.insertTask(task)
+            showQuickMessage("Task has been added", palette.primaryColor1)
+            val nowDay = "${currentYear.intValue}-${"%02d".format((currentMonth.intValue))}-${"%02d".format((currentDay.intValue))}"
+            if (task.startDate <= nowDay && task.endDate >= nowDay){
+                fetchTasks(currentYear.intValue,currentMonth.intValue,currentDay.intValue)
+            }
+            isCreateActivityWindowVisible.value = false
         } catch (e: Exception) {
-            Log.e("inserting T Error",e.message.toString())
+            showQuickMessage("Task hasn't been added")
             throw e
         } finally {
             isWaitingScreenVisible.value = false
+        }
+    }
+    private suspend fun getTasksOnDay(year: Int, month: Int, day: Int): MutableList<Task>{
+        try {
+            val targetTime = "$year-${"%02d".format((month))}-${"%02d".format((day))}"
+            return taskDao.getTasksOnDay(targetTime).toMutableList()
+        } catch (e: Exception){
+            showQuickMessage("No tasks were fetched.")
+            throw e
         }
     }
     fun fetchAllTask() {
@@ -243,7 +260,7 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
             try {
                 val tasksList = taskDao.getAllTasks()
                 tasksList.forEach {
-                    println("${it.name} -- ${it.notes}")
+                    Log.d(it.name,it.toString())
                 }
             } catch (e: Exception) {
                 Log.e("getting T Error", e.message.toString())
@@ -253,16 +270,49 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
             }
         }
     }
+    fun setNewDate(year: Int,month: Int,day: Int){
+        currentYear.intValue = year
+        currentMonth.intValue = month
+        currentDay.intValue = day
+
+    }
+    //--}Task Area---------------------------------------------------------------------------------------------
+
     fun showQuickMessage(
-        message:String = quickMessageState.value.message,
-        background: Color = quickMessageState.value.colorBG,
+        message: String = "Something wrong",
+        background: Color = palette.hardColor,
         time: Long = 2000
-        ){
-        quickMessageState.value = QMInfo(message,background)
-        isQuickMessageScreenVisible.value = true
+    ) {
+        // Додаємо повідомлення до черги
+        messageQueue.add(QMInfo(message, background))
+
+        // Якщо черга ще не обробляється, запускаємо обробку
+        if (!isProcessingQueue) {
+            processMessageQueue(time)
+        }
+    }
+    private fun processMessageQueue(time: Long) {
+        isProcessingQueue = true // Встановлюємо флаг, що черга обробляється
+
         viewModelScope.launch {
-            delay(time)
-            isQuickMessageScreenVisible.value = false
+            while (messageQueue.isNotEmpty()) {
+                // Беремо перше повідомлення з черги
+                val currentMessage = messageQueue.removeAt(0)
+
+                // Встановлюємо повідомлення для показу
+                quickMessageState.value = currentMessage
+                isQuickMessageScreenVisible.value = true
+
+                // Затримка на показ повідомлення
+                delay(time)
+
+                // Ховаємо повідомлення
+                isQuickMessageScreenVisible.value = false
+
+                // Затримка перед показом наступного (якщо потрібна)
+                delay(time / 4)
+            }
+            isProcessingQueue = false // Завершили обробку черги
         }
     }
 }

@@ -1,9 +1,10 @@
 package com.example.floduty.data.models
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "tasks")
+@Entity(tableName = "tasks",indices = [Index(value = ["startDate", "endDate"])])
 data class Task(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
@@ -23,6 +24,13 @@ data class Task(
 
     fun getStartTime(): Int{
         return startHour * 60 + startMinute
+    }
+    fun getTimeSFormat(isStartTime: Boolean): String{
+        return if (isStartTime){
+            "${"%02d".format(startHour)}:${"%02d".format(startMinute)}"
+        }else{
+            "${"%02d".format(endHour)}:${"%02d".format(endMinute)}"
+        }
     }
     companion object {
         fun createTask(

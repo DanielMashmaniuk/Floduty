@@ -21,17 +21,13 @@ data class DateAndTime(
     }
 
     fun getDateTxtFormat(mainViewData: MainViewData): String{
-        return "${convertToFormatWithZero(day)} ${mainViewData.getMonthsNameByNumber(month)} $year"
+        return "${"%02d".format(day)} ${mainViewData.getMonthsNameByNumber(month)} $year"
     }
-    fun getPatternFormat(): String{
-        println("$year $month $day $hour $minutes")
-        return "${convertToFormatWithZero(day)}-${convertToFormatWithZero(month)}-$year ${convertToFormatWithZero(hour)}:${convertToFormatWithZero(minutes)}"
+    fun getPatternFormat(): String {
+        return "%02d-%02d-%d %02d:%02d".format(day, month, year, hour, minutes)
     }
-    private fun convertToFormatWithZero(n: Int) : String{
-        return if (n < 10){
-            "0$n"
-        }else{
-            n.toString()
-        }
+    fun getDateDatabaseFormat(): String {
+        return "$year-${"%02d".format((month))}-${"%02d".format((day))}"
     }
+
 }

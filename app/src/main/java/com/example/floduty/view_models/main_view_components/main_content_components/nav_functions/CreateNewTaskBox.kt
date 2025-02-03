@@ -259,13 +259,13 @@ fun CreateNewTaskBox(mainViewData: MainViewData) {
                                     isClickedCButton.value = false
                                 }
                                 if (screenData.titleActivity.value.isEmpty()){
+                                    mainViewData.showQuickMessage("Name area is empty")
                                     return@clickable
                                 }
                                 if (screenData.textDifference.value == "Invalid Time"){
+                                    mainViewData.showQuickMessage("Time duration is invalid")
                                     return@clickable
                                 }
-
-                                mainViewData.isWaitingScreenVisible.value= true
 
                                 Task.createTask(
                                     screenData.titleActivity.value,
@@ -273,10 +273,10 @@ fun CreateNewTaskBox(mainViewData: MainViewData) {
                                     screenData.notes,
                                     screenData.startDate.value.hour,
                                     screenData.startDate.value.minutes,
-                                    screenData.startDate.value.getDateTxtFormat(mainViewData),
+                                    screenData.startDate.value.getDateDatabaseFormat(),
                                     screenData.endDate.value.hour,
                                     screenData.endDate.value.minutes,
-                                    screenData.endDate.value.getDateTxtFormat(mainViewData),
+                                    screenData.endDate.value.getDateDatabaseFormat(),
                                     screenData.currentLevel.intValue,
                                     screenData.checkIsComplete()
                                 ){

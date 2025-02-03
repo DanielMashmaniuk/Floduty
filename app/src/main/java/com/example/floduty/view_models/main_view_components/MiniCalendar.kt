@@ -40,15 +40,15 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 @Composable
-fun MiniCalendar(mainViewData: MainViewData, currentYear: Int, currentMonth: Int, currentDay: Int){
+fun MiniCalendar(mainViewData: MainViewData){
 
     AnimatedVisibility(
         visible = mainViewData.isCalendarVisible.value,
         enter = fadeIn() + expandVertically(),  // Ефект появи
         exit = fadeOut() + shrinkVertically()   // Ефект зникнення
     ) {
-        val monthCalendar = remember { mutableIntStateOf(currentMonth) }
-        val yearCalendar = remember { mutableIntStateOf(currentYear) }
+        val monthCalendar = remember { mutableIntStateOf(mainViewData.currentMonth.intValue) }
+        val yearCalendar = remember { mutableIntStateOf(mainViewData.currentYear.intValue) }
 
         Box(
             modifier = Modifier
@@ -58,7 +58,7 @@ fun MiniCalendar(mainViewData: MainViewData, currentYear: Int, currentMonth: Int
                 .background(palette.secondBG)
         ) {
 
-            CustomCalendar(yearCalendar.intValue, monthCalendar.intValue, currentDay, mainViewData)
+            CustomCalendar(yearCalendar.intValue, monthCalendar.intValue, mainViewData)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -148,7 +148,7 @@ fun MiniCalendar(mainViewData: MainViewData, currentYear: Int, currentMonth: Int
     }
 }
 @Composable
-fun CustomCalendar(year: Int, month: Int, currentDay: Int, mainViewData: MainViewData) {
+fun CustomCalendar(year: Int, month: Int, mainViewData: MainViewData) {
     val calendarData = generateCalendarData(year,month)
 
     Column(
@@ -176,13 +176,17 @@ fun CustomCalendar(year: Int, month: Int, currentDay: Int, mainViewData: MainVie
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 week.forEach { day ->
-                    if (mainViewData.isCurrentDay(year,day!!.monthValue, day.dayOfMonth)) {
-                        CurrentDayBox(day.dayOfMonth ) // Для поточного місяця
+                    if (mainViewData.isCurrentDay(year, day!!.monthValue, day.dayOfMonth)) {
+                        CurrentDayBox(day.dayOfMonth) {
+                            mainViewData.setNewDate(year, month, it)
+                        }
                     } else if (day != null) {
                         if (day.monthValue != month) {
                             InactiveDayBox(day.dayOfMonth) // Для минулого або наступного місяця
                         } else {
-                            DayBox(day.dayOfMonth.toString()) // Для поточного місяця
+                            DayBox(day.dayOfMonth) {
+                                mainViewData.setNewDate(year, month, it)
+                            }
                         }
                     } else {
                         InactiveDayBox(-1) // Для порожніх клітинок

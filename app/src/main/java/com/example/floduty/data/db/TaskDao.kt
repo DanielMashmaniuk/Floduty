@@ -17,6 +17,9 @@ interface TaskDao {
     @Query("SELECT * FROM tasks")
     suspend fun getAllTasks(): List<Task>
 
+    @Query("SELECT * FROM tasks WHERE startDate <= :targetDate AND endDate >= :targetDate")
+    suspend fun getTasksOnDay(targetDate: String): List<Task>
+
     @Query("SELECT * FROM tasks WHERE id = :taskId")
     suspend fun getTaskById(taskId: Int): Task?
 }

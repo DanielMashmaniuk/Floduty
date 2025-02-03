@@ -14,14 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.floduty.screens.MainViewData
-import com.example.floduty.ui.theme.Palette
 import com.example.floduty.view_models.main_view_components.main_content_components.DayInfo
 import com.example.floduty.view_models.main_view_components.main_content_components.ScheduleNav
 import com.example.floduty.view_models.main_view_components.main_content_components.ScheduleTable
 import com.example.floduty.view_models.main_view_components.main_content_components.nav_functions.CreateNewTaskBox
 
 @Composable
-fun MainContent(currentYear: Int, currentMonth : Int, currentDay: Int, mainViewData: MainViewData) {
+fun MainContent(mainViewData: MainViewData) {
 
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -36,10 +35,7 @@ fun MainContent(currentYear: Int, currentMonth : Int, currentDay: Int, mainViewD
             contentAlignment = Alignment.Center
         ) {
             DayInfo(
-                currentYear = currentYear,
-                currentMonth = currentMonth,
-                currentDay = currentDay,
-                mainViewData = mainViewData
+                vData = mainViewData
             )
         }
         Box(
@@ -49,9 +45,6 @@ fun MainContent(currentYear: Int, currentMonth : Int, currentDay: Int, mainViewD
             contentAlignment = Alignment.Center
         ) {
             ScheduleNav(
-                currentYear = currentYear,
-                currentMonth = currentMonth,
-                currentDay = currentDay,
                 mainViewData = mainViewData,
             )
         }

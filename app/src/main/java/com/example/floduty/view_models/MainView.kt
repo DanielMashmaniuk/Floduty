@@ -23,10 +23,7 @@ import com.example.floduty.view_models.main_view_components.QuickMessageBox
 
 @Composable
 fun MainView(mainViewData: MainViewData) {
-    val currentMonth = mainViewData.currentMonth.intValue
-    val currentYear = mainViewData.currentYear.intValue
-    val currentDay = mainViewData.currentDay.intValue
-
+    mainViewData.fetchTasks(mainViewData.currentYear.intValue,mainViewData.currentMonth.intValue,mainViewData.currentDay.intValue)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -41,16 +38,13 @@ fun MainView(mainViewData: MainViewData) {
                 .align(Alignment.TopCenter),
             contentAlignment = Alignment.Center
         ){
-            MainContent(currentYear,currentMonth,currentDay,mainViewData)
+            MainContent(mainViewData)
         }
         Box(
             modifier = Modifier.align(Alignment.Center)
         ) {
             MiniCalendar(
                 mainViewData = mainViewData,
-                currentYear = currentYear,
-                currentMonth = currentMonth,
-                currentDay = currentDay,
             )
         }
         Box(

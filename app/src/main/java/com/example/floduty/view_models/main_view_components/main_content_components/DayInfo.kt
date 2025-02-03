@@ -24,7 +24,7 @@ import com.example.floduty.ui.theme.Palette
 import com.example.floduty.ui.theme.palette
 
 @Composable
-fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, mainViewData: MainViewData) {
+fun DayInfo(vData: MainViewData) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -57,7 +57,7 @@ fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, mainViewData:
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = currentDay.toString(),
+                    text = vData.currentDay.intValue.toString(),
                     color = palette.mainBG,
                     style = TextStyle(
                         fontSize = 28.sp,
@@ -67,7 +67,7 @@ fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, mainViewData:
             }
         }
         Text(
-            text = "${mainViewData.getMonthsNameByNumber(currentMonth)},$currentYear",
+            text = "${vData.getMonthsNameByNumber(vData.currentMonth.intValue)},${vData.currentYear.intValue}",
             color = palette.whiteColor,
             style = TextStyle(
                 fontSize = 16.sp,
@@ -80,11 +80,11 @@ fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, mainViewData:
             modifier = Modifier
                 .width(300.dp)
         ){
-            TasksCountsBox(1, 1, mainViewData,palette )
-            TasksCountsBox(2, 2, mainViewData,palette )
-            TasksCountsBox(3, 3, mainViewData, palette )
-            TasksCountsBox(4, 4, mainViewData, palette )
-            TasksCountsBox(5, 5, mainViewData, palette )
+            TasksCountsBox(1, 1, vData,palette )
+            TasksCountsBox(2, 2, vData,palette )
+            TasksCountsBox(3, 3, vData, palette )
+            TasksCountsBox(4, 4, vData, palette )
+            TasksCountsBox(5, 5, vData, palette )
 
         }
         Column(
@@ -93,9 +93,9 @@ fun DayInfo(currentYear: Int, currentMonth : Int, currentDay: Int, mainViewData:
             modifier = Modifier
                 .width(300.dp)
         ) {
-            InfoBox("Busyness   ",1,palette,mainViewData)
-            InfoBox("Intensity     ",3,palette,mainViewData)
-            InfoBox("Importance",5,palette,mainViewData)
+            InfoBox("Busyness   ",1,palette,vData)
+            InfoBox("Intensity     ",3,palette,vData)
+            InfoBox("Importance",5,palette,vData)
         }
     }
 }
