@@ -20,6 +20,7 @@ import com.example.floduty.view_models.main_view_components.MainContent
 import com.example.floduty.view_models.main_view_components.MiniCalendar
 import com.example.floduty.view_models.main_view_components.NavButtons
 import com.example.floduty.view_models.main_view_components.QuickMessageBox
+import com.example.floduty.view_models.main_view_components.TestBox
 
 @Composable
 fun MainView(mainViewData: MainViewData) {
@@ -57,6 +58,12 @@ fun MainView(mainViewData: MainViewData) {
             .align(Alignment.TopCenter)
         ){
             QuickMessageBox(mainViewData)
+        }
+        Box(Modifier
+            .width(getScreenWidth().dp)
+            .align(Alignment.Center)
+        ){
+            TestBox(mainViewData)
         }
     }
 }

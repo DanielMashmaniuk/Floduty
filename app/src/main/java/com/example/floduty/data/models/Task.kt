@@ -32,6 +32,13 @@ data class Task(
             "${"%02d".format(endHour)}:${"%02d".format(endMinute)}"
         }
     }
+    fun getDateFormat(isStartTime: Boolean): String{
+        return if (isStartTime){
+            "${"%d".format()}-${"%02d".format(startMinute)}-${"%02d".format(startMinute)}"
+        }else{
+            "${"%02d".format(endHour)}:${"%02d".format(endMinute)}"
+        }
+    }
     companion object {
         fun createTask(
             n: String,
@@ -58,7 +65,7 @@ data class Task(
                 startHour = sHour,
                 startMinute = sMinute,
                 startDate = startDate,
-                endHour = eHour,
+                endHour = if (eHour == 0) 24 else eHour,
                 endMinute = endMinute,
                 endDate = endDate,
                 weight = weight,

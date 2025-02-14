@@ -1,0 +1,28 @@
+{
+  "ConstraintSets": {
+    "start": {
+      "box": {
+        "width": 100,
+        "height": 100,
+        "start": ["parent", "start", 16],
+        "top": ["parent", "top", 16]
+      }
+    },
+    "end": {
+      "box": {
+        "width": 150,
+        "height": 150,
+        "end": ["parent", "end", 16],
+        "bottom": ["parent", "bottom", 16]
+      }
+    }
+  },
+  "Transitions": {
+    "default": {
+      "from": "start",
+      "to": "end",
+      "pathMotionArc": "startVertical",
+      "duration": 1000
+    }
+  }
+}

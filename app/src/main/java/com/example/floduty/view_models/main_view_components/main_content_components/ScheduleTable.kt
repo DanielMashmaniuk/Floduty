@@ -1,7 +1,6 @@
 package com.example.floduty.view_models.main_view_components.main_content_components
 
 import android.util.Log
-import androidx.compose.compiler.plugins.kotlin.lower.fastForEach
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.floduty.data.models.Task
 import com.example.floduty.screens.MainViewData
-import com.example.floduty.ui.theme.Palette
 import com.example.floduty.ui.theme.palette
 
 @Composable
@@ -266,9 +264,7 @@ fun getTasksByMinuteAtHour(mainViewData: MainViewData,hour: Int): List<TaskDispl
     return mainViewData.tasks.value.mapNotNull { task ->
         val taskStartTime = task.startHour * 60 + task.startMinute
         val taskEndTime = task.endHour * 60 + task.endMinute
-        val today = "${"%02d".format(mainViewData.currentYear.intValue)}-" +
-                "${"%02d".format(mainViewData.currentMonth.intValue)}-" +
-                "%02d".format(mainViewData.currentDay.intValue)
+        val today = mainViewData.getThisDay()
 
         val isTaskInThisDay = task.startDate <= today && task.endDate >= today
         val isTaskDuringHour = taskStartTime <= hourEnd && taskEndTime >= hourStart

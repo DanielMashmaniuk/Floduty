@@ -1,23 +1,20 @@
 package com.example.floduty.screens
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.floduty.data.models.Task
 import com.example.floduty.data.db.TaskDao
 import com.example.floduty.data.models.DateAndTime
-import com.example.floduty.ui.theme.Palette
 import com.example.floduty.ui.theme.palette
-import com.example.floduty.view_models.main_view_components.CurrentDayBox
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -33,12 +30,15 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
     val currentMinute = mutableIntStateOf(getCurrentMinute())
     val tasksGroupsInHourLines = mutableStateListOf(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
 
+    val busynessLevel = mutableIntStateOf(1)
 
     //VISIBILITIES
     val isCreateActivityWindowVisible = mutableStateOf(false)
     val isCalendarVisible = mutableStateOf(false)
     private val isWaitingScreenVisible = mutableStateOf(false)
     val isQuickMessageScreenVisible = mutableStateOf(false)
+    val isTestScreenVisible = mutableStateOf(false)
+
 
     val quickMessageState= mutableStateOf(QMInfo())
     private val messageQueue = mutableListOf<QMInfo>() // Черга повідомлень
@@ -227,6 +227,7 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
             if (tasks.value.isEmpty()){
                 showQuickMessage("No tasks here....")
             }
+            checkBusiness(tasks.value)
         }
     }
     //{--Task Area---------------------------------------------------------------------------------------------
@@ -270,12 +271,43 @@ class MainViewData(private val taskDao: TaskDao) : ViewModel() {
             }
         }
     }
+    fun getThisDay():String {
+        return "${"%d".format(currentYear.intValue)}-" +
+                "${"%02d".format(currentMonth.intValue)}-" +
+                "%02d".format(currentDay.intValue)
+    }
     fun setNewDate(year: Int,month: Int,day: Int){
         currentYear.intValue = year
         currentMonth.intValue = month
         currentDay.intValue = day
 
     }
+    private suspend fun checkBusiness(tasks: List<Task>) {
+        var duration = 0
+
+        for (task in tasks) {
+            val isStartThatDay = task.startDate == getThisDay()
+            val isEndThisDay = task.endDate == getThisDay()
+
+            duration += when {
+                !isEndThisDay && !isStartThatDay -> 12 * 60
+                !isEndThisDay && isStartThatDay -> 24 * 60 - (task.startHour * 60 + task.startMinute)
+                isEndThisDay && !isStartThatDay -> task.endHour * 60 + task.endMinute
+                isEndThisDay && isStartThatDay ->
+                    (task.endHour * 60 + task.endMinute) - (task.startHour * 60 + task.startMinute)
+                else -> 0
+            }
+        }
+
+        busynessLevel.value = when {
+            duration <= 2 * 60 -> 1
+            duration <= 4 * 60 -> 2
+            duration <= 8 * 60 -> 3
+            duration <= 12 * 60 -> 4
+            else -> 5
+        }
+    }
+
     //--}Task Area---------------------------------------------------------------------------------------------
 
     fun showQuickMessage(
@@ -342,6 +374,4 @@ class QMInfo(
     val message : String = "Something Wrong",
     val colorBG : Color = palette.hardColor,
     val textColor : Color = palette.mainBG
-){
-
-}
+)

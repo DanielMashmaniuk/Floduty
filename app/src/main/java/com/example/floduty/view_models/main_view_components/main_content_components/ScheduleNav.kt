@@ -77,7 +77,7 @@ fun ScheduleNav(
                     )
                 }
                 IconButton(
-                    onClick = {  },
+                    onClick = { mainViewData.isTestScreenVisible.value = !mainViewData.isTestScreenVisible.value },
                     modifier = Modifier.size(28.dp)
                 ) {
                     Icon(

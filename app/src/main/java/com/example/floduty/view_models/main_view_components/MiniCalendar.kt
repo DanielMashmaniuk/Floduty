@@ -176,25 +176,35 @@ fun CustomCalendar(year: Int, month: Int, mainViewData: MainViewData) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 week.forEach { day ->
-                    if (mainViewData.isCurrentDay(year, day!!.monthValue, day.dayOfMonth)) {
-                        CurrentDayBox(day.dayOfMonth) {
-                            mainViewData.setNewDate(year, month, it)
-                        }
-                    } else if (day != null) {
-                        if (day.monthValue != month) {
-                            InactiveDayBox(day.dayOfMonth) // Для минулого або наступного місяця
-                        } else {
-                            DayBox(day.dayOfMonth) {
+                    day?.let { it ->
+                        val isCurrent = mainViewData.isCurrentDay(year, day.monthValue, day.dayOfMonth)
+                        val isActive = isActivatedDay(mainViewData, year, day.monthValue, day.dayOfMonth)
+
+                        when {
+                            isCurrent && isActive -> ActiveDayBox(it.dayOfMonth, true)
+                            isCurrent -> CurrentDayBox(it.dayOfMonth) {
                                 mainViewData.setNewDate(year, month, it)
+                                mainViewData.isCalendarVisible.value = false
+                            }
+                            it.monthValue != month -> InactiveDayBox(it.dayOfMonth)
+                            isActive -> ActiveDayBox(it.dayOfMonth)
+                            else -> DayBox(it.dayOfMonth) {
+                                mainViewData.setNewDate(year, month, it)
+                                mainViewData.isCalendarVisible.value = false
                             }
                         }
-                    } else {
-                        InactiveDayBox(-1) // Для порожніх клітинок
-                    }
+                    } ?: InactiveDayBox(-1) // Для порожніх клітинок
                 }
+
             }
         }
     }
+}
+fun isActivatedDay(mainViewData: MainViewData,year: Int,month: Int,day:Int):Boolean{
+    val thisYear = mainViewData.currentYear.intValue == year
+    val thisMonth = mainViewData.currentMonth.intValue == month
+    val thisDay = mainViewData.currentDay.intValue == day
+    return thisMonth && thisYear && thisDay
 }
 fun setPreviousMonthCalendar(month: Int,year: Int): Pair<Int,Int> {
     if (month == 1) {

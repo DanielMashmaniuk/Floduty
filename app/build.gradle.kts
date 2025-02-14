@@ -1,8 +1,9 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
-    id ("kotlin-kapt")  // Додаємо KAPT
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -52,9 +53,6 @@ android {
         }
     }
 }
-kapt {
-    correctErrorTypes = true
-}
 // Define compose compiler configuration
 
 
@@ -62,6 +60,7 @@ dependencies {
     implementation(libs.ui.v140)
     implementation(libs.androidx.material)
     implementation(libs.ui.tooling.preview)
+    implementation(libs.androidx.constraintlayout.compose.android)
     debugImplementation(libs.ui.tooling)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -85,10 +84,10 @@ dependencies {
     implementation(libs.ui)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
-    implementation(libs.androidx.room.runtime.v250)
     implementation(libs.kotlin.stdlib)
-    kapt (libs.androidx.room.compiler) // для Kotlin
-
+    implementation(libs.compose.shimmer)
     implementation(libs.dagger)
     implementation(libs.androidx.compiler)
+
+    ksp("androidx.room:room-compiler:2.5.0")
 }

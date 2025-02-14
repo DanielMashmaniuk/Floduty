@@ -22,9 +22,14 @@ import androidx.compose.ui.unit.sp
 import com.example.floduty.screens.MainViewData
 import com.example.floduty.ui.theme.Palette
 import com.example.floduty.ui.theme.palette
+import com.valentinilk.shimmer.ShimmerBounds
+import com.valentinilk.shimmer.rememberShimmer
+import com.valentinilk.shimmer.shimmer
 
 @Composable
 fun DayInfo(vData: MainViewData) {
+    val shimmerInstance = rememberShimmer(shimmerBounds = ShimmerBounds.View) // Ініціалізуємо ефект
+
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -77,14 +82,31 @@ fun DayInfo(vData: MainViewData) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .width(300.dp)
+
         ){
-            TasksCountsBox(1, 1, vData,palette )
-            TasksCountsBox(2, 2, vData,palette )
-            TasksCountsBox(3, 3, vData, palette )
-            TasksCountsBox(4, 4, vData, palette )
-            TasksCountsBox(5, 5, vData, palette )
+            val simpleTasks  = vData.tasks.value.filter { it.weight == 1 }
+            val easyTasks  = vData.tasks.value.filter { it.weight == 2 }
+            val mediumTasks  = vData.tasks.value.filter { it.weight == 3 }
+            val hardTasks  = vData.tasks.value.filter { it.weight == 4 }
+            val extremeTasks  = vData.tasks.value.filter { it.weight == 5 }
+            if (simpleTasks.isNotEmpty()){
+                TasksCountsBox(simpleTasks.size, 1, vData )
+            }
+            if (easyTasks.isNotEmpty()){
+                TasksCountsBox(easyTasks.size, 2, vData )
+            }
+            if (mediumTasks.isNotEmpty()){
+                TasksCountsBox(mediumTasks.size, 3, vData )
+            }
+            if (hardTasks.isNotEmpty()){
+                TasksCountsBox(hardTasks.size, 4, vData )
+            }
+            if (extremeTasks.isNotEmpty()){
+                TasksCountsBox(extremeTasks.size, 5, vData )
+            }
+            if (simpleTasks.isEmpty() && easyTasks.isEmpty() && mediumTasks.isEmpty() && hardTasks.isEmpty() && extremeTasks.isEmpty()){
+                TasksCountsBox(0,0,vData)
+            }
 
         }
         Column(
@@ -93,15 +115,14 @@ fun DayInfo(vData: MainViewData) {
             modifier = Modifier
                 .width(300.dp)
         ) {
-            InfoBox("Busyness   ",1,palette,vData)
-            InfoBox("Intensity     ",3,palette,vData)
-            InfoBox("Importance",5,palette,vData)
+            InfoBox("Busyness   ",vData.busynessLevel.intValue,vData)
+            InfoBox("Intensity     ",3,vData)
+            InfoBox("Importance",5,vData)
         }
     }
 }
-
 @Composable
-fun InfoBox(description: String, level : Int, palette: Palette, mainViewData: MainViewData){
+fun InfoBox(description: String, level : Int, mainViewData: MainViewData){
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -149,13 +170,14 @@ fun LevelBox(level: Int, palette: Palette, mainViewData: MainViewData){
     }
 }
 @Composable
-fun TasksCountsBox(tasks: Int, level: Int, mainViewData: MainViewData, palette: Palette){
+fun TasksCountsBox(tasks: Int, level: Int, mainViewData: MainViewData){
+    val zero = level == 0
     Box(
         modifier = Modifier
             .height(30.dp)
             .width(50.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(mainViewData.getLevelColor(level)),
+            .background(if (zero) palette.lightGaryBG else mainViewData.getLevelColor(level)),
         contentAlignment = Alignment.Center
     ){
         Text(
